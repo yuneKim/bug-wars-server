@@ -26,6 +26,7 @@ jobs:
         id: jacoco
         uses: cicirello/jacoco-badge-generator@v2
         with:
+          generate-summary: true
           on-missing-report: fail
           fail-if-coverage-less-than: 80
           fail-if-branches-less-than: 80
