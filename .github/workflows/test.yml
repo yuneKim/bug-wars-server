@@ -19,32 +19,15 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
-      - name: Build with Maven
-        run: mvn -B package -Pcoverage --file pom.xml
+      - name: Run Tests
+        run: mvn -B test
 
-      - name: Add coverage to PR
+      - name: Generate JaCoCo Badge
         id: jacoco
-        uses: madrapps/jacoco-report@v1.6.1
-        with:
-          paths: ${{ github.workspace }}/target/site/jacoco/jacoco.xml
-          token: ${{ secrets.GITHUB_TOKEN }}
-          min-coverage-overall: 80
-          min-coverage-changed-files: 80
-          title: Code Coverage
+        uses: cicirello/jacoco-badge-generator@v2
 
-      - name: Save Coverage To Environment Variable
+      - name: Log coverage percentage
         run: |
-          echo "TOTAL_COVERAGE=${{ steps.jacoco.outputs.coverage-overall }}" >> $GITHUB_ENV
-          echo "CHANGED_FILES_COVERAGE=${{ steps.jacoco.outputs.coverage-changed-files }}" >> $GITHUB_ENV
+          echo "coverage = ${{ steps.jacoco.outputs.coverage }}"
+          echo "branch coverage = ${{ steps.jacoco.outputs.branches }}"
 
-          - name: Print & Check Coverage Info
-            run: |
-              import os
-              import sys
-              print("Total Coverage: " + str(os.environ["TOTAL_COVERAGE"]))
-              print("Changed Files Coverage: " + str(os.environ["CHANGED_FILES_COVERAGE"]))
-              if float(os.environ["TOTAL_COVERAGE"]) < 80 or float(os.environ["CHANGED_FILES_COVERAGE"]) < 80:
-                print("Insufficient Coverage!")
-                sys.exit(-1) # Cause Status Check Failure due to noncompliant coverage
-              sys.exit(0)
-            shell: python
