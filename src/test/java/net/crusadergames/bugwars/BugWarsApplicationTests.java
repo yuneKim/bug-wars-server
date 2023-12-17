@@ -12,9 +12,4 @@ class BugWarsApplicationTests {
 	void contextLoads() {
 	}
 
-	@Test
-	void alwaysFail() {
-		fail("always fail");
-	}
-
 }
