@@ -49,7 +49,7 @@ public class SampleControllerTests {
     @Test
     public void addUser_returnsCreated() throws Exception {
         SampleUser user = SampleUser.builder().username("Charlie").build();
-        given(sampleService.addUser(ArgumentMatchers.any())).willAnswer(invocation -> invocation.getArgument(0));
+        when(sampleService.addUser(ArgumentMatchers.any())).thenReturn(user);
 
         ResultActions response = mockMvc.perform(post("/users/add")
                 .contentType(MediaType.APPLICATION_JSON)
