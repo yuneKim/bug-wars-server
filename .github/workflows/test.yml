@@ -8,16 +8,33 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
+
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
-      - name: Build with Maven
-        run: mvn -B package --file pom.xml
+      - name: Run Tests
+        run: mvn -B test
+
+      - name: Determine coverage
+        uses: cicirello/jacoco-badge-generator@v2
+        with:
+          generate-workflow-summary: false
+
+      - name: Log coverage percentage
+        run: |
+          echo "coverage = ${{ steps.jacoco.outputs.coverage }}"
+          echo "branch coverage = ${{ steps.jacoco.outputs.branches }}"
+
+      - name: Check for coverage failure
+        uses: cicirello/jacoco-badge-generator@v2
+        with:
+          on-missing-report: fail
+          fail-if-coverage-less-than: 80
+          fail-if-branches-less-than: 80

@@ -1,6 +1,7 @@
 package net.crusadergames.bugwars;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,15 +12,16 @@ import java.util.List;
 public class SampleController {
 
     @Autowired
-    UserRepository userRepository;
+    SampleService sampleService;
 
     @GetMapping()
     List<SampleUser> getAll() {
-        return userRepository.findAll();
+        return sampleService.getAll();
     }
 
     @PostMapping("/add")
+    @ResponseStatus(HttpStatus.CREATED)
     SampleUser addUser(@RequestBody SampleUser newUser) {
-        return userRepository.save(newUser);
+        return sampleService.addUser(newUser);
     }
 }
