@@ -8,13 +8,13 @@ import java.util.List;
 @Service
 public class SampleService {
     @Autowired
-    UserRepository userRepository;
+    SampleUserRepository sampleUserRepository;
 
     public List<SampleUser> getAll() {
-        return userRepository.findAll();
+        return sampleUserRepository.findAll();
     }
 
     public SampleUser addUser(SampleUser newUser) {
-        return userRepository.save(newUser);
+        return sampleUserRepository.save(newUser);
     }
 }

@@ -15,7 +15,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class SampleServiceTests {
     @Mock
-    private UserRepository userRepository;
+    private SampleUserRepository sampleUserRepository;
 
     @InjectMocks
     private SampleService sampleService;
@@ -23,7 +23,7 @@ public class SampleServiceTests {
     @Test
     public void getAll_returnsAllUsers() {
         SampleUser user = SampleUser.builder().username("Charlie").build();
-        when(userRepository.findAll()).thenReturn(List.of(user));
+        when(sampleUserRepository.findAll()).thenReturn(List.of(user));
 
         List<SampleUser> users = sampleService.getAll();
 
@@ -33,7 +33,7 @@ public class SampleServiceTests {
     @Test
     public void addUser_returnsCreatedUser() {
         SampleUser user = SampleUser.builder().username("Fred").build();
-        when(userRepository.save(Mockito.any(SampleUser.class))).thenReturn(user);
+        when(sampleUserRepository.save(Mockito.any(SampleUser.class))).thenReturn(user);
 
         SampleUser savedUser = sampleService.addUser(user);
 
