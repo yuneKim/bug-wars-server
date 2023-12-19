@@ -1,4 +1,4 @@
-package net.crusadergames.bugwars.payload.response;
+package net.crusadergames.bugwars.dto.response;
 
 import lombok.Data;
 

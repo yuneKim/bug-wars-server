@@ -1,10 +1,10 @@
 package net.crusadergames.bugwars.controller;
 
 import jakarta.validation.Valid;
+import net.crusadergames.bugwars.dto.request.LoginRequest;
+import net.crusadergames.bugwars.dto.request.SignupRequest;
+import net.crusadergames.bugwars.dto.response.JwtResponse;
 import net.crusadergames.bugwars.model.auth.User;
-import net.crusadergames.bugwars.payload.request.LoginRequest;
-import net.crusadergames.bugwars.payload.request.SignupRequest;
-import net.crusadergames.bugwars.payload.response.JwtResponse;
 import net.crusadergames.bugwars.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
