@@ -4,10 +4,10 @@ import jakarta.validation.Valid;
 import net.crusadergames.bugwars.model.auth.User;
 import net.crusadergames.bugwars.payload.request.LoginRequest;
 import net.crusadergames.bugwars.payload.request.SignupRequest;
+import net.crusadergames.bugwars.payload.response.JwtResponse;
 import net.crusadergames.bugwars.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin
@@ -18,7 +18,7 @@ public class AuthController {
     AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+    public JwtResponse authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         return authService.authenticateUser(loginRequest);
     }
 
