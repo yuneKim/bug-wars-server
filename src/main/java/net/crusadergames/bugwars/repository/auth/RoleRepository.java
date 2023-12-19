@@ -1,4 +1,4 @@
-package net.crusadergames.bugwars.repository;
+package net.crusadergames.bugwars.repository.auth;
 
 import net.crusadergames.bugwars.model.auth.ERole;
 import net.crusadergames.bugwars.model.auth.Role;
@@ -9,5 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Long> {
-  Optional<Role> findByName(ERole name);
+    Optional<Role> findByName(ERole name);
 }

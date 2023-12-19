@@ -1,7 +1,7 @@
 package net.crusadergames.bugwars.security.service;
 
 import net.crusadergames.bugwars.model.auth.User;
-import net.crusadergames.bugwars.repository.UserRepository;
+import net.crusadergames.bugwars.repository.auth.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

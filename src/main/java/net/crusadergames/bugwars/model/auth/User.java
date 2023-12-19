@@ -1,5 +1,6 @@
 package net.crusadergames.bugwars.model.auth;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "users",
@@ -25,7 +27,7 @@ import java.util.Set;
 @AllArgsConstructor
 @JsonPropertyOrder({"id", "username", "password", "roles"})
 public class User {
-
+    @JsonIgnore
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -44,6 +46,7 @@ public class User {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
+    @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
@@ -55,4 +58,8 @@ public class User {
         this.password = password;
     }
 
+    @JsonGetter("roles")
+    public List<String> getRolesAsStrings() {
+        return roles.stream().map(role -> role.getName().name()).collect(Collectors.toList());
+    }
 }
