@@ -17,14 +17,15 @@ public class AuthController {
     @Autowired
     AuthService authService;
 
-    @PostMapping("/login")
-    public JwtResponse authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-        return authService.authenticateUser(loginRequest);
-    }
-
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/register")
     public User registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+        System.out.println(signUpRequest);
         return authService.registerUser(signUpRequest);
+    }
+
+    @PostMapping("/login")
+    public JwtResponse authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+        return authService.authenticateUser(loginRequest);
     }
 }

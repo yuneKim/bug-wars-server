@@ -22,25 +22,47 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class AuthService {
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    RoleRepository roleRepository;
+    private RoleRepository roleRepository;
 
     @Autowired
-    PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
-    AuthenticationManager authenticationManager;
+    private AuthenticationManager authenticationManager;
 
     @Autowired
-    JwtUtils jwtUtils;
+    private JwtUtils jwtUtils;
+
+    public User registerUser(SignupRequest signUpRequest) {
+        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username is already taken");
+        }
+
+        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already taken");
+        }
+
+        User user = new User(signUpRequest.getUsername(), signUpRequest.getEmail(),
+                passwordEncoder.encode(signUpRequest.getPassword()));
+
+        Optional<Role> optUserRole = roleRepository.findByName(ERole.ROLE_USER);
+        if (optUserRole.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong.");
+        }
+        Role userRole = optUserRole.get();
+        user.setRoles(Set.of(userRole));
+        return userRepository.save(user);
+    }
 
     public JwtResponse authenticateUser(LoginRequest loginRequest) {
         Authentication authentication = authenticationManager
@@ -54,22 +76,5 @@ public class AuthService {
                 .collect(Collectors.toList());
 
         return new JwtResponse(jwt, userDetails.getUsername(), roles);
-    }
-
-    public User registerUser(SignupRequest signUpRequest) {
-        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username is already taken");
-        }
-
-        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already taken");
-        }
-
-        User user = new User(signUpRequest.getUsername(), signUpRequest.getEmail(),
-                passwordEncoder.encode(signUpRequest.getPassword()));
-        Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-        user.setRoles(Set.of(userRole));
-        return userRepository.save(user);
     }
 }
