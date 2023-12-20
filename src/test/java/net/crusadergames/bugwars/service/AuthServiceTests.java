@@ -9,6 +9,7 @@ import net.crusadergames.bugwars.model.auth.User;
 import net.crusadergames.bugwars.repository.auth.RoleRepository;
 import net.crusadergames.bugwars.repository.auth.UserRepository;
 import net.crusadergames.bugwars.security.jwt.JwtUtils;
+import net.crusadergames.bugwars.security.service.UserDetailsImpl;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,12 +19,16 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -95,9 +100,19 @@ public class AuthServiceTests {
         LoginRequest loginRequest = new LoginRequest("test_user", "password111");
         JwtResponse jwtResponse = new JwtResponse("token", "user", List.of("ROLE_USER"));
 
+        Authentication mockAuthentication = mock(Authentication.class);
+        when(authenticationManager.authenticate(Mockito.any())).thenReturn(mockAuthentication);
+
+        UserDetailsImpl mockUserDetails = new UserDetailsImpl(
+                1L,
+                loginRequest.getUsername(),
+                loginRequest.getPassword(),
+                Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"))
+        );
+        when(mockAuthentication.getPrincipal()).thenReturn(mockUserDetails);
 
         JwtResponse response = authService.authenticateUser(loginRequest);
 
-        Assertions.assertThat(jwtResponse).isNotNull();
+        Assertions.assertThat(response).isNotNull();
     }
 }
