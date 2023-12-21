@@ -54,7 +54,7 @@ public class AuthServiceTests {
     @Test
     public void registerUser_returnsUser() {
         SignupRequest signupRequest = new SignupRequest("test_user", "test@gmail.com", "password111");
-        User user = User.builder().username(signupRequest.getUsername()).build();
+        User user = new User(signupRequest.getUsername(), signupRequest.getEmail(), signupRequest.getPassword());
         when(userRepository.existsByUsername(Mockito.any())).thenReturn(false);
         when(userRepository.existsByEmail(Mockito.any())).thenReturn(false);
         when(userRepository.save(Mockito.any(User.class))).thenReturn(user);

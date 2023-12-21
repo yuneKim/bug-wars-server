@@ -41,10 +41,7 @@ public class AuthControllerTests {
     @Test
     public void registerUser_returnsUser() throws Exception {
         SignupRequest signupRequest = new SignupRequest("test_user", "test@gmail.com", "password111");
-        User user = User.builder()
-                .username(signupRequest.getUsername())
-                .email(signupRequest.getEmail())
-                .build();
+        User user = new User(signupRequest.getUsername(), signupRequest.getEmail(), signupRequest.getPassword());
         when(authService.registerUser(ArgumentMatchers.any())).thenReturn(user);
 
         ResultActions response = mockMvc.perform(post("/api/auth/register")

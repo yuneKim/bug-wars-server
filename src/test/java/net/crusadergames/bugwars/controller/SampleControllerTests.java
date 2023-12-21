@@ -37,7 +37,7 @@ public class SampleControllerTests {
     private ObjectMapper objectMapper;
 
     @Test
-    public void getAll_returnsAllUsers() throws Exception {
+    public void getAll_returnsAllStrings() throws Exception {
         SampleString string = SampleString.builder().content("chocolate").build();
         when(sampleStringService.getAll()).thenReturn(List.of(string));
 
@@ -48,7 +48,7 @@ public class SampleControllerTests {
     }
 
     @Test
-    public void addUser_returnsCreated() throws Exception {
+    public void addUser_returnsCreatedString() throws Exception {
         SampleString string = SampleString.builder().content("polar bear").build();
         when(sampleStringService.addString(ArgumentMatchers.any())).thenReturn(string);
 

@@ -23,7 +23,7 @@ public class SampleServiceTests {
     private SampleStringService sampleStringService;
 
     @Test
-    public void getAll_returnsAllUsers() {
+    public void getAll_returnsAllStrings() {
         SampleString string = SampleString.builder().content("some string").build();
         when(sampleStringRepository.findAll()).thenReturn(List.of(string));
 
@@ -33,7 +33,7 @@ public class SampleServiceTests {
     }
 
     @Test
-    public void addUser_returnsCreatedUser() {
+    public void addUser_returnsCreatedString() {
         SampleString string = SampleString.builder().content("porcupine").build();
         when(sampleStringRepository.save(Mockito.any(SampleString.class))).thenReturn(string);
 
