@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @ExtendWith(MockitoExtension.class)
 public class SampleControllerSecurityTests {
 
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
+    private static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
             "postgres:15-alpine"
     );
 
@@ -52,17 +52,17 @@ public class SampleControllerSecurityTests {
     private ObjectMapper objectMapper;
 
     @BeforeAll
-    static void beforeAll() {
+    public static void beforeAll() {
         postgres.start();
     }
 
     @AfterAll
-    static void afterAll() {
+    public static void afterAll() {
         postgres.stop();
     }
 
     @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
+    public static void configureProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", postgres::getJdbcUrl);
         registry.add("spring.datasource.username", postgres::getUsername);
         registry.add("spring.datasource.password", postgres::getPassword);
