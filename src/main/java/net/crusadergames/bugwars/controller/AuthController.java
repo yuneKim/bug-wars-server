@@ -20,7 +20,6 @@ public class AuthController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/register")
     public User registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
-        System.out.println(signUpRequest);
         return authService.registerUser(signUpRequest);
     }
 
