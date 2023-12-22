@@ -2,6 +2,8 @@ package net.crusadergames.bugwars.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.crusadergames.bugwars.model.SampleString;
+import net.crusadergames.bugwars.repository.auth.RoleRepository;
+import net.crusadergames.bugwars.repository.auth.UserRepository;
 import net.crusadergames.bugwars.service.SampleStringService;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.AfterAll;
@@ -29,40 +31,25 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
 public class SampleControllerSecurityTests {
 
-    private static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
-            "postgres:15-alpine"
-    );
-
     @Autowired
     private MockMvc mockMvc;
+
+    @MockBean
+    RoleRepository roleRepository;
+
+    @MockBean
+    UserRepository userRepository;
 
     @MockBean
     private SampleStringService sampleStringService;
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @BeforeAll
-    public static void beforeAll() {
-        postgres.start();
-    }
-
-    @AfterAll
-    public static void afterAll() {
-        postgres.stop();
-    }
-
-    @DynamicPropertySource
-    public static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
-    }
 
     @Test
     public void getAll_returnalsAllUsersWhenNotAuthenticated() throws Exception {
