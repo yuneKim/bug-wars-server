@@ -1,6 +1,8 @@
-package net.crusadergames.bugwars;
+package net.crusadergames.bugwars.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.crusadergames.bugwars.model.SampleString;
+import net.crusadergames.bugwars.service.SampleStringService;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +23,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
-@WebMvcTest(controllers = SampleController.class)
+@WebMvcTest(controllers = SampleStringController.class)
 @AutoConfigureMockMvc(addFilters = false)
 @ExtendWith(MockitoExtension.class)
 public class SampleControllerTests {
@@ -29,32 +31,32 @@ public class SampleControllerTests {
     private MockMvc mockMvc;
 
     @MockBean
-    private SampleService sampleService;
+    private SampleStringService sampleStringService;
 
     @Autowired
     private ObjectMapper objectMapper;
 
     @Test
-    public void getAll_returnsAllUsers() throws Exception {
-        SampleUser user = SampleUser.builder().username("Susan").build();
-        when(sampleService.getAll()).thenReturn(List.of(user));
+    public void getAll_returnsAllStrings() throws Exception {
+        SampleString string = SampleString.builder().content("chocolate").build();
+        when(sampleStringService.getAll()).thenReturn(List.of(string));
 
-        ResultActions response = mockMvc.perform(get("/users"));
+        ResultActions response = mockMvc.perform(get("/api/sampleStrings"));
 
         response.andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.size()", CoreMatchers.is(1)));
     }
 
     @Test
-    public void addUser_returnsCreated() throws Exception {
-        SampleUser user = SampleUser.builder().username("Charlie").build();
-        when(sampleService.addUser(ArgumentMatchers.any())).thenReturn(user);
+    public void addUser_returnsCreatedString() throws Exception {
+        SampleString string = SampleString.builder().content("polar bear").build();
+        when(sampleStringService.addString(ArgumentMatchers.any())).thenReturn(string);
 
-        ResultActions response = mockMvc.perform(post("/users/add")
+        ResultActions response = mockMvc.perform(post("/api/sampleStrings")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(user)));
+                .content(objectMapper.writeValueAsString(string)));
 
         response.andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.username", CoreMatchers.is(user.getUsername())));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.content", CoreMatchers.is(string.getContent())));
     }
 }
