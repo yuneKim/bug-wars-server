@@ -1,13 +1,20 @@
 name: Java CI with Maven
 
 on:
-  push:
-    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
+env:
+  COVERAGE_THRESHOLD: 80
+  BRANCH_COVERAGE_THRESHOLD: 80
+  PASS_EMOJI: 🟢
+  FAIL_EMOJI: 🔴
+
 jobs:
   build:
+    permissions:
+      contents: read
+      pull-requests: write
     runs-on: ubuntu-latest
 
     steps:
@@ -23,18 +30,34 @@ jobs:
         run: mvn -B test
 
       - name: Determine coverage
+        id: jacoco
         uses: cicirello/jacoco-badge-generator@v2
         with:
           generate-workflow-summary: false
 
-      - name: Log coverage percentage
+      - name: Do math on coverage values
+        env:
+          RAW_COVERAGE: ${{steps.jacoco.outputs.coverage}}
+          RAW_BRANCH_COVERAGE: ${{steps.jacoco.outputs.branches}}
         run: |
-          echo "coverage = ${{ steps.jacoco.outputs.coverage }}"
-          echo "branch coverage = ${{ steps.jacoco.outputs.branches }}"
+          coverage_percentage=$(echo "$RAW_COVERAGE * 100" | bc)
+          printf "COVERAGE=%.0f\n" "$coverage_percentage" >> $GITHUB_ENV
+          branch_coverage_percentage=$(echo "$RAW_BRANCH_COVERAGE * 100" | bc)
+          printf "BRANCH_COVERAGE=%.0f\n" "$branch_coverage_percentage" >> $GITHUB_ENV
+
+      - name: Comment on PR
+        uses: mshick/add-pr-comment@v2
+        with:
+          message: |
+            ## Coverage Report
+            | Status | Category | Percentage |
+            | :--:  | :-------- | ---------: |
+            | ${{ env.COVERAGE >= fromJSON(env.COVERAGE_THRESHOLD) && env.PASS_EMOJI || env.FAIL_EMOJI }} | Coverage | ${{env.COVERAGE}}% / ${{env.COVERAGE_THRESHOLD}}% |
+            | ${{ env.BRANCH_COVERAGE >= fromJSON(env.BRANCH_COVERAGE_THRESHOLD) && env.PASS_EMOJI || env.FAIL_EMOJI}} | Branch Coverage | ${{env.BRANCH_COVERAGE}}% / ${{env.BRANCH_COVERAGE_THRESHOLD}}% |
 
       - name: Check for coverage failure
         uses: cicirello/jacoco-badge-generator@v2
         with:
           on-missing-report: fail
-          fail-if-coverage-less-than: 80
-          fail-if-branches-less-than: 80
+          fail-if-coverage-less-than: ${{ env.COVERAGE_THRESHOLD }}
+          fail-if-branches-less-than: ${{ env.BRANCH_COVERAGE_THRESHOLD }}
