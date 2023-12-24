@@ -6,8 +6,6 @@ import net.crusadergames.bugwars.repository.auth.RoleRepository;
 import net.crusadergames.bugwars.repository.auth.UserRepository;
 import net.crusadergames.bugwars.service.SampleStringService;
 import org.hamcrest.CoreMatchers;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
@@ -18,12 +16,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.util.List;
 
@@ -36,15 +31,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @ExtendWith(MockitoExtension.class)
 public class SampleControllerSecurityTests {
 
-    @Autowired
-    private MockMvc mockMvc;
-
     @MockBean
     RoleRepository roleRepository;
-
     @MockBean
     UserRepository userRepository;
-
+    @Autowired
+    private MockMvc mockMvc;
     @MockBean
     private SampleStringService sampleStringService;
 
