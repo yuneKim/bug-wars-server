@@ -15,6 +15,8 @@ import net.crusadergames.bugwars.repository.auth.UserRepository;
 import net.crusadergames.bugwars.security.jwt.JwtUtils;
 import net.crusadergames.bugwars.security.service.RefreshTokenService;
 import net.crusadergames.bugwars.security.service.UserDetailsImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -34,6 +36,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class AuthService {
+    private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
+
     @Autowired
     RefreshTokenService refreshTokenService;
     @Autowired
@@ -92,6 +96,9 @@ public class AuthService {
         refreshTokenService.verifyExpiration(refreshToken);
         User user = refreshToken.getUser();
         String token = jwtUtils.generateTokenFromUsername(user.getUsername());
+
+        logger.info("Token refreshed");
+
         return new TokenRefreshResponse(token, requestRefreshToken);
     }
 
