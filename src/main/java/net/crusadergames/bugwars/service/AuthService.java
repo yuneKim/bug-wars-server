@@ -2,13 +2,18 @@ package net.crusadergames.bugwars.service;
 
 import net.crusadergames.bugwars.dto.request.LoginRequest;
 import net.crusadergames.bugwars.dto.request.SignupRequest;
+import net.crusadergames.bugwars.dto.request.TokenRefreshRequest;
 import net.crusadergames.bugwars.dto.response.JwtResponse;
+import net.crusadergames.bugwars.dto.response.TokenRefreshResponse;
+import net.crusadergames.bugwars.exception.TokenRefreshException;
 import net.crusadergames.bugwars.model.auth.ERole;
+import net.crusadergames.bugwars.model.auth.RefreshToken;
 import net.crusadergames.bugwars.model.auth.Role;
 import net.crusadergames.bugwars.model.auth.User;
 import net.crusadergames.bugwars.repository.auth.RoleRepository;
 import net.crusadergames.bugwars.repository.auth.UserRepository;
 import net.crusadergames.bugwars.security.jwt.JwtUtils;
+import net.crusadergames.bugwars.security.service.RefreshTokenService;
 import net.crusadergames.bugwars.security.service.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -29,17 +35,15 @@ import java.util.stream.Collectors;
 @Service
 public class AuthService {
     @Autowired
+    RefreshTokenService refreshTokenService;
+    @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private RoleRepository roleRepository;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
-
     @Autowired
     private AuthenticationManager authenticationManager;
-
     @Autowired
     private JwtUtils jwtUtils;
 
@@ -75,6 +79,26 @@ public class AuthService {
         List<String> roles = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
-        return new JwtResponse(jwt, userDetails.getUsername(), roles);
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
+
+        return new JwtResponse(jwt, refreshToken.getToken(), userDetails.getUsername(), roles);
+    }
+
+    public TokenRefreshResponse refreshToken(TokenRefreshRequest request) {
+        String requestRefreshToken = request.getRefreshToken();
+
+        RefreshToken refreshToken = refreshTokenService.findByToken(requestRefreshToken).orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
+                "Refresh token is not in database!"));
+        refreshTokenService.verifyExpiration(refreshToken);
+        User user = refreshToken.getUser();
+        String token = jwtUtils.generateTokenFromUsername(user.getUsername());
+        return new TokenRefreshResponse(token, requestRefreshToken);
+    }
+
+    public void logout(Principal principal) {
+        if (principal == null) return;
+
+        User user = userRepository.findByUsername(principal.getName()).orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
+        refreshTokenService.deleteByUserId(user.getId());
     }
 }

@@ -56,7 +56,7 @@ public class AuthControllerTests {
     @Test
     public void authenticateUser_returnsJwtResponse() throws Exception {
         LoginRequest loginRequest = new LoginRequest("test_user", "password111");
-        JwtResponse jwtResponse = new JwtResponse("token", "user", List.of("ROLE_USER"));
+        JwtResponse jwtResponse = new JwtResponse("accessToken", "refreshToken", "user", List.of("ROLE_USER"));
         when(authService.authenticateUser(ArgumentMatchers.any())).thenReturn(jwtResponse);
 
         ResultActions response = mockMvc.perform(post("/api/auth/login")
@@ -64,6 +64,7 @@ public class AuthControllerTests {
                 .content(objectMapper.writeValueAsString(loginRequest)));
 
         response.andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.token", CoreMatchers.is("token")));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.accessToken", CoreMatchers.is("accessToken")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.refreshToken", CoreMatchers.is("refreshToken")));
     }
 }

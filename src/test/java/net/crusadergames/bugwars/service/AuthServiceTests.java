@@ -2,13 +2,16 @@ package net.crusadergames.bugwars.service;
 
 import net.crusadergames.bugwars.dto.request.LoginRequest;
 import net.crusadergames.bugwars.dto.request.SignupRequest;
+import net.crusadergames.bugwars.dto.request.TokenRefreshRequest;
 import net.crusadergames.bugwars.dto.response.JwtResponse;
 import net.crusadergames.bugwars.model.auth.ERole;
+import net.crusadergames.bugwars.model.auth.RefreshToken;
 import net.crusadergames.bugwars.model.auth.Role;
 import net.crusadergames.bugwars.model.auth.User;
 import net.crusadergames.bugwars.repository.auth.RoleRepository;
 import net.crusadergames.bugwars.repository.auth.UserRepository;
 import net.crusadergames.bugwars.security.jwt.JwtUtils;
+import net.crusadergames.bugwars.security.service.RefreshTokenService;
 import net.crusadergames.bugwars.security.service.UserDetailsImpl;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -24,12 +27,12 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.security.Principal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthServiceTests {
@@ -47,6 +50,9 @@ public class AuthServiceTests {
 
     @Mock
     private AuthenticationManager authenticationManager;
+
+    @Mock
+    private RefreshTokenService refreshTokenService;
 
     @InjectMocks
     private AuthService authService;
@@ -98,7 +104,7 @@ public class AuthServiceTests {
     @Test
     public void authenticateUser_returnsJwtResponse() {
         LoginRequest loginRequest = new LoginRequest("test_user", "password111");
-        JwtResponse jwtResponse = new JwtResponse("token", "user", List.of("ROLE_USER"));
+        JwtResponse jwtResponse = new JwtResponse("accessToken", "refreshToken", "user", List.of("ROLE_USER"));
 
         Authentication mockAuthentication = mock(Authentication.class);
         when(authenticationManager.authenticate(Mockito.any())).thenReturn(mockAuthentication);
@@ -109,10 +115,39 @@ public class AuthServiceTests {
                 loginRequest.getPassword(),
                 Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"))
         );
+        RefreshToken mockRefreshToken = new RefreshToken();
+        mockRefreshToken.setToken("mock token");
+
         when(mockAuthentication.getPrincipal()).thenReturn(mockUserDetails);
+        when(refreshTokenService.createRefreshToken(Mockito.any())).thenReturn(mockRefreshToken);
 
         JwtResponse response = authService.authenticateUser(loginRequest);
 
         Assertions.assertThat(response).isNotNull();
+    }
+
+    @Test
+    public void refreshToken_returnsTokenRefreshResponse() {
+        TokenRefreshRequest request = new TokenRefreshRequest("token");
+        RefreshToken refreshToken = Mockito.mock(RefreshToken.class);
+        User mockUser = new User();
+        mockUser.setUsername("test_user");
+        when(refreshTokenService.findByToken(Mockito.any())).thenReturn(Optional.of(refreshToken));
+        when(refreshToken.getUser()).thenReturn(mockUser);
+        Assertions.assertThat(authService.refreshToken(request)).isNotNull();
+    }
+
+    @Test
+    public void logout_deletesRefreshToken() {
+        User mockUser = new User();
+        mockUser.setId(5L);
+        when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.of(mockUser));
+        authService.logout(Mockito.mock(Principal.class));
+        verify(refreshTokenService).deleteByUserId(mockUser.getId());
+    }
+
+    @Test
+    public void logout_handlesNullPrincipal() {
+        Assertions.assertThatCode(() -> authService.logout(null)).doesNotThrowAnyException();
     }
 }

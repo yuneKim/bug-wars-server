@@ -1,4 +1,4 @@
-package net.crusadergames.bugwars.repository.auth;
+package net.crusadergames.bugwars.repository;
 
 import net.crusadergames.bugwars.model.SampleString;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,7 +1,7 @@
 package net.crusadergames.bugwars.service;
 
 import net.crusadergames.bugwars.model.SampleString;
-import net.crusadergames.bugwars.repository.auth.SampleStringRepository;
+import net.crusadergames.bugwars.repository.SampleStringRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
