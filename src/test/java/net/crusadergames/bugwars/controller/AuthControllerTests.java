@@ -3,7 +3,9 @@ package net.crusadergames.bugwars.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.crusadergames.bugwars.dto.request.LoginRequest;
 import net.crusadergames.bugwars.dto.request.SignupRequest;
+import net.crusadergames.bugwars.dto.request.TokenRefreshRequest;
 import net.crusadergames.bugwars.dto.response.JwtResponse;
+import net.crusadergames.bugwars.dto.response.TokenRefreshResponse;
 import net.crusadergames.bugwars.model.auth.User;
 import net.crusadergames.bugwars.service.AuthService;
 import org.hamcrest.CoreMatchers;
@@ -56,7 +58,7 @@ public class AuthControllerTests {
     @Test
     public void authenticateUser_returnsJwtResponse() throws Exception {
         LoginRequest loginRequest = new LoginRequest("test_user", "password111");
-        JwtResponse jwtResponse = new JwtResponse("token", "user", List.of("ROLE_USER"));
+        JwtResponse jwtResponse = new JwtResponse("accessToken", "refreshToken", "user", List.of("ROLE_USER"));
         when(authService.authenticateUser(ArgumentMatchers.any())).thenReturn(jwtResponse);
 
         ResultActions response = mockMvc.perform(post("/api/auth/login")
@@ -64,6 +66,28 @@ public class AuthControllerTests {
                 .content(objectMapper.writeValueAsString(loginRequest)));
 
         response.andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.token", CoreMatchers.is("token")));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.accessToken", CoreMatchers.is("accessToken")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.refreshToken", CoreMatchers.is("refreshToken")));
+    }
+
+    @Test
+    public void refreshToken_returnsTokenRefreshResponse() throws Exception {
+        TokenRefreshRequest refreshRequest = new TokenRefreshRequest("refreshToken");
+        TokenRefreshResponse refreshResponse = new TokenRefreshResponse("accessToken", "refreshToken");
+        when(authService.refreshToken(ArgumentMatchers.any())).thenReturn(refreshResponse);
+
+        ResultActions response = mockMvc.perform(post("/api/auth/refresh-token")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(refreshRequest)));
+
+        response.andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.accessToken", CoreMatchers.is("accessToken")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.refreshToken", CoreMatchers.is("refreshToken")));
+    }
+
+    @Test
+    public void logout_returnsOkStatus() throws Exception {
+        mockMvc.perform(post("/api/auth/logout"))
+                .andExpect(MockMvcResultMatchers.status().isOk());
     }
 }
