@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BugAssemblyValidationRequest {
+public class BugAssemblyParseRequest {
     @NotBlank
     private String code;
 }
