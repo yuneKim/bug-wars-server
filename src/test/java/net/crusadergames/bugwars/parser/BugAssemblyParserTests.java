@@ -13,8 +13,7 @@ public class BugAssemblyParserTests {
 
     @BeforeEach
     public void setUp() {
-        parser = new BugAssemblyParser(BugAssemblyCommands.getActions(),
-                BugAssemblyCommands.getControls());
+        parser = new BugAssemblyParserFactory().createInstance();
     }
 
     @Test
