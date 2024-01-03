@@ -32,6 +32,14 @@ public class ScriptService {
         return scriptRepository.findByUser(user.get());
     }
 
+    public Script getById(long id) {
+        Optional<Script> script = scriptRepository.findById(id);
+        if (script.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Script not found.");
+        }
+        return script.get();
+    }
+
     private Long getUserId(Principal principal) {
         Optional<User> user = userRepository.findByUsername(principal.getName());
         if (user.isEmpty()) {
