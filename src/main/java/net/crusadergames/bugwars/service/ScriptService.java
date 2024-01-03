@@ -23,29 +23,29 @@ public class ScriptService {
     UserRepository userRepository;
 
     public List<Script> getUserScripts(Principal principal) {
-        Long userId = getUserId(principal);
-        Optional<User> user = userRepository.findById(userId);
+        User user = getUser(principal);
 
-        if (user.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Logged in user does not exist.");
-        }
-        return scriptRepository.findByUser(user.get());
+        return scriptRepository.findByUser(user);
     }
 
-    public Script getById(long id) {
-        Optional<Script> script = scriptRepository.findById(id);
-        if (script.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Script not found.");
+    public Script getByIdAndUser(long id, Principal principal) {
+        User user = getUser(principal);
+
+        Script script = scriptRepository.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                        "Script does not exist for user."));
+
+        if (user != script.getUser()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the associated user can access this resource.");
         }
-        return script.get();
+
+        return script;
     }
 
-    private Long getUserId(Principal principal) {
-        Optional<User> user = userRepository.findByUsername(principal.getName());
-        if (user.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Logged in user does not exist.");
-        }
-        return user.get().getId();
+    private User getUser(Principal principal) {
+        return userRepository.findByUsername(principal.getName()).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                        "User does not exist."));
     }
 
 

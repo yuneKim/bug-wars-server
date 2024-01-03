@@ -13,3 +13,5 @@ INSERT INTO user_roles (user_id, role_id)
 VALUES
     ((SELECT id FROM users WHERE username = 'test_user'), (SELECT id FROM roles WHERE name = 'ROLE_USER'))
 ON CONFLICT (user_id, role_id) DO NOTHING;
+
+INSERT INTO
