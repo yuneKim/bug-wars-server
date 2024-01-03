@@ -1,5 +1,7 @@
 package net.crusadergames.bugwars.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -20,17 +22,23 @@ public class Script {
     private Long id;
 
     @ManyToOne
+    @JsonIgnoreProperties({"scripts"})
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @NotBlank
+    @Column(name = "name")
     private String name;
 
     @NotBlank
+    @Column(name = "script_string")
     private String scriptString;
 
     @NotBlank
-    private String byteCodeString;
+    @Column(name = "bytecode_string")
+    private String bytecodeString;
 
     @NotBlank
-    private boolean isByteCodeValid;
+    @Column(name = "is_bytecode_valid")
+    private boolean isBytecodeValid;
 }
