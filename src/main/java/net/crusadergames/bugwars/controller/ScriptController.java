@@ -27,7 +27,7 @@ public class ScriptController {
 
     @GetMapping(path="/{id}")
     public Script getScript(@PathVariable long id, Principal principal) {
-        return scriptService.getById(id, principal);
+        return scriptService.getByIdAndUser(id, principal);
     }
 
 }

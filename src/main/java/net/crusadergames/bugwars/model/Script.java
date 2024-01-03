@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,18 +28,22 @@ public class Script {
     private User user;
 
     @NotBlank
-    @Column(name = "name")
+    @Column(name = "name", length = 100)
+    @Size(min = 1, max = 100)
     private String name;
 
     @NotBlank
-    @Column(name = "script_string")
+    @Column(name = "script_string", length = 10000)
+    @Size(max = 10000)
     private String scriptString;
 
     @NotBlank
-    @Column(name = "bytecode_string")
+    @Size(max = 10000)
+    @Column(name = "bytecode_string", length = 10000)
     private String bytecodeString;
 
     @NotBlank
     @Column(name = "is_bytecode_valid")
     private boolean isBytecodeValid;
+
 }
