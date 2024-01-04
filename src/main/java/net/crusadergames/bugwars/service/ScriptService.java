@@ -32,7 +32,7 @@ public class ScriptService {
 
         Script script = scriptRepository.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
-                        "Script does not exist for user."));
+                        "Script does not exist."));
 
         if (user != script.getUser()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the associated user can access this resource.");
