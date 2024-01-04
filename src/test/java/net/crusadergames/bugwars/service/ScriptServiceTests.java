@@ -21,10 +21,10 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class ScriptServiceTests {
 
-    private final User user = new User("tortellini", "gmail@email.com", "passingTests");
-    private final Script SCRIPT_1 = new Script(1L, user, "The Ol' Razzle Dazzle", ":START dance", "20 49 103 952 1039 59 30 10", true);
-    private final Script SCRIPT_2 = new Script(1L, user, "Sneaky Peeky", ":START :END", "03 050 20 50 03 06 10 50", true);
-    private final Script SCRIPT_3 = new Script(1L, user, "Burger Bite", ":START att ifEnemy bite", "05 30 0t 30 f05 52c go2", true);
+    private final User USER = new User("tortellini", "gmail@email.com", "passingTests");
+    private final Script SCRIPT_1 = new Script(1L, USER, "The Ol' Razzle Dazzle", ":START dance", "20 49 103 952 1039 59 30 10", true);
+    private final Script SCRIPT_2 = new Script(2L, USER, "Sneaky Peeky", ":START :END", "03 050 20 50 03 06 10 50", true);
+    private final Script SCRIPT_3 = new Script(3L, USER, "Burger Bite", ":START att ifEnemy bite", "05 30 0t 30 f05 52c go2", true);
 
 
     @Mock
@@ -48,5 +48,18 @@ public class ScriptServiceTests {
 
         Assertions.assertThat(scripts).hasSize(2);
     }
+
+    @Test
+    public void getScript_returnsCorrectScript() {
+        when(scriptRepository.findById(Mockito.any())).thenReturn(Optional.of(SCRIPT_3));
+
+        USER.setId(1L);
+        when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.of(USER));
+
+        Script testScript = scriptService.getScript(3L, Mockito.mock(Principal.class));
+
+        Assertions.assertThat(testScript).isEqualTo(SCRIPT_3);
+    }
+
 
 }

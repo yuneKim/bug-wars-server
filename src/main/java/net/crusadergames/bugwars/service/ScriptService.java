@@ -27,14 +27,14 @@ public class ScriptService {
         return scriptRepository.findByUser(user);
     }
 
-    public Script getByIdAndUser(long id, Principal principal) {
+    public Script getScript(long id, Principal principal) {
         User user = getUser(principal);
 
         Script script = scriptRepository.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
                         "Script does not exist."));
 
-        if (user != script.getUser()) {
+        if (!user.getId().equals(script.getUser().getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the associated user can access this resource.");
         }
 
