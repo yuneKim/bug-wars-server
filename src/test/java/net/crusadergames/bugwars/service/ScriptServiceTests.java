@@ -77,5 +77,17 @@ public class ScriptServiceTests {
                 .hasFieldOrPropertyWithValue("status", HttpStatus.FORBIDDEN);
     }
 
+    @Test
+    public void getScript_respondsWithServerErrorOnMissingScript() {
+        USER.setId(1L);
+        when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.of(USER));
+
+        Assertions.assertThatThrownBy(() -> scriptService.getScript(5L, Mockito.mock(Principal.class)))
+                .isInstanceOf(ResponseStatusException.class)
+                .hasFieldOrPropertyWithValue("status", HttpStatus.INTERNAL_SERVER_ERROR);
+
+
+    }
+
 
 }
