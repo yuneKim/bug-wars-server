@@ -11,6 +11,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.util.List;
@@ -37,7 +39,7 @@ public class ScriptServiceTests {
     private ScriptService scriptService;
 
     @Test
-    public void getUserScripts_returns_all_users_scripts() {
+    public void getUserScripts_returnsAllUsersScripts() {
         when(scriptRepository.findByUser(Mockito.any())).thenReturn(List.of(SCRIPT_1, SCRIPT_2));
 
         User mockUser = new User();
@@ -59,6 +61,20 @@ public class ScriptServiceTests {
         Script testScript = scriptService.getScript(3L, Mockito.mock(Principal.class));
 
         Assertions.assertThat(testScript).isEqualTo(SCRIPT_3);
+    }
+
+    @Test
+    public void getScript_respondsWithForbiddenStatusOnIncorrectUser() {
+        USER.setId(1L);
+        User mockUser = new User();
+        mockUser.setId(2L);
+        when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.of(mockUser));
+
+        when(scriptRepository.findById(Mockito.any())).thenReturn(Optional.of(SCRIPT_3));
+
+        Assertions.assertThatThrownBy(() -> scriptService.getScript(1L,Mockito.mock(Principal.class)))
+                .isInstanceOf(ResponseStatusException.class)
+                .hasFieldOrPropertyWithValue("status", HttpStatus.FORBIDDEN);
     }
 
 
