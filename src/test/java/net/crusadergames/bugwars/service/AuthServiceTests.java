@@ -4,6 +4,7 @@ import net.crusadergames.bugwars.dto.request.LoginRequest;
 import net.crusadergames.bugwars.dto.request.SignupRequest;
 import net.crusadergames.bugwars.dto.request.TokenRefreshRequest;
 import net.crusadergames.bugwars.dto.response.JwtResponse;
+import net.crusadergames.bugwars.exception.TokenRefreshException;
 import net.crusadergames.bugwars.model.auth.ERole;
 import net.crusadergames.bugwars.model.auth.RefreshToken;
 import net.crusadergames.bugwars.model.auth.Role;
@@ -138,6 +139,15 @@ public class AuthServiceTests {
     }
 
     @Test
+    public void refreshToken_throwsExceptionWhenTokenIsNotFound() {
+        TokenRefreshRequest request = new TokenRefreshRequest("token");
+        when(refreshTokenService.findByToken(Mockito.any())).thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> authService.refreshToken(request))
+                .isInstanceOf(TokenRefreshException.class);
+    }
+
+    @Test
     public void logout_deletesRefreshToken() {
         User mockUser = new User();
         mockUser.setId(5L);
@@ -149,5 +159,16 @@ public class AuthServiceTests {
     @Test
     public void logout_handlesNullPrincipal() {
         Assertions.assertThatCode(() -> authService.logout(null)).doesNotThrowAnyException();
+    }
+
+    @Test
+    public void logout_throwsExceptionWhenUserDoesNotExist() {
+        Principal mockPrincipal = Mockito.mock(Principal.class);
+        when(mockPrincipal.getName()).thenReturn("Fred");
+        when(userRepository.findByUsername("Fred")).thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> authService.logout(mockPrincipal))
+                .isInstanceOf(ResponseStatusException.class)
+                .hasFieldOrPropertyWithValue("status", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

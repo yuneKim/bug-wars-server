@@ -72,7 +72,7 @@ public class ScriptServiceTests {
 
         when(scriptRepository.findById(Mockito.any())).thenReturn(Optional.of(SCRIPT_3));
 
-        Assertions.assertThatThrownBy(() -> scriptService.getScript(1L,Mockito.mock(Principal.class)))
+        Assertions.assertThatThrownBy(() -> scriptService.getScript(1L, Mockito.mock(Principal.class)))
                 .isInstanceOf(ResponseStatusException.class)
                 .hasFieldOrPropertyWithValue("status", HttpStatus.FORBIDDEN);
     }
@@ -85,8 +85,6 @@ public class ScriptServiceTests {
         Assertions.assertThatThrownBy(() -> scriptService.getScript(5L, Mockito.mock(Principal.class)))
                 .isInstanceOf(ResponseStatusException.class)
                 .hasFieldOrPropertyWithValue("status", HttpStatus.INTERNAL_SERVER_ERROR);
-
-
     }
 
     @Test
@@ -99,6 +97,4 @@ public class ScriptServiceTests {
                 .isInstanceOf(ResponseStatusException.class)
                 .hasFieldOrPropertyWithValue("status", HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
-
 }
