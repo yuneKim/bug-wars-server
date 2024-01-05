@@ -181,7 +181,7 @@ public class BugAssemblyParser {
         String missingLabelList = missingLabels.stream()
                 .sorted(Comparator.comparing((label) -> context.getLabelPlaceholderLineNumbers(label).get(0)))
                 .map((label) -> String.format(
-                                "%s on lines [%s]",
+                                "%s on line(s) [%s]",
                                 label,
                                 context.getLabelPlaceholderLineNumbers(label).stream()
                                         .map(String::valueOf)
