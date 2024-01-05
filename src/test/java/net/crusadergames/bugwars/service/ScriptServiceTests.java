@@ -78,13 +78,13 @@ public class ScriptServiceTests {
     }
 
     @Test
-    public void getScript_respondsWithServerErrorOnMissingScript() {
+    public void getScript_respondsWithNotFoundOnMissingScript() {
         USER.setId(1L);
         when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.of(USER));
 
         Assertions.assertThatThrownBy(() -> scriptService.getScript(5L, Mockito.mock(Principal.class)))
                 .isInstanceOf(ResponseStatusException.class)
-                .hasFieldOrPropertyWithValue("status", HttpStatus.INTERNAL_SERVER_ERROR);
+                .hasFieldOrPropertyWithValue("status", HttpStatus.NOT_FOUND);
     }
 
     @Test

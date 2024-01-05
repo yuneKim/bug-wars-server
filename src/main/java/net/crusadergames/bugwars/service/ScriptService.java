@@ -31,7 +31,7 @@ public class ScriptService {
         User user = getUser(principal);
 
         Script script = scriptRepository.findById(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "Script does not exist."));
 
         if (!user.getId().equals(script.getUser().getId())) {
