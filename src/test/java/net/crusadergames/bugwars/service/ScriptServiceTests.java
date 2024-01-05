@@ -89,5 +89,16 @@ public class ScriptServiceTests {
 
     }
 
+    @Test
+    public void getUser_respondsWithServerErrorOnMissingUser() {
+        Principal mockPrincipal = Mockito.mock(Principal.class);
+        when(mockPrincipal.getName()).thenReturn("Guillermo");
+        when(userRepository.findByUsername("Guillermo")).thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> scriptService.getScript(1L, mockPrincipal))
+                .isInstanceOf(ResponseStatusException.class)
+                .hasFieldOrPropertyWithValue("status", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 
 }
