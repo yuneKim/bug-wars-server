@@ -12,8 +12,7 @@ import lombok.NoArgsConstructor;
 import net.crusadergames.bugwars.model.auth.User;
 
 @Entity
-@Table(name = "script")
-@Builder
+@Table(name = "scripts")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,7 +22,7 @@ public class Script {
     private Long id;
 
     @ManyToOne
-    @JsonIgnoreProperties({"scripts"})
+    @JsonIgnore
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
@@ -33,14 +32,14 @@ public class Script {
     private String name;
 
     @NotBlank
-    @Column(name = "script_string", length = 10000)
+    @Column(name = "raw", length = 10000)
     @Size(max = 10000)
-    private String scriptString;
+    private String raw;
 
     @NotBlank
     @Size(max = 10000)
-    @Column(name = "bytecode_string", length = 10000)
-    private String bytecodeString;
+    @Column(name = "bytecode", length = 10000)
+    private String bytecode;
 
     @NotBlank
     @Column(name = "is_bytecode_valid")

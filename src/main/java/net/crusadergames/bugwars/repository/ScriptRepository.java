@@ -13,7 +13,4 @@ public interface ScriptRepository extends JpaRepository<Script, Long> {
 
     List<Script> findByUser(User user);
 
-    //if user doesn't match, throw exception in service
-//    Script findById(Long id);
-
 }
