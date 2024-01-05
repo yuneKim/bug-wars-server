@@ -4,7 +4,8 @@ Program a bug army and compete against others in a battle for survival! This is 
 
 ## Tech
 
-![Static Badge](https://img.shields.io/badge/TypeScript-grey?logo=typescript&logoColor=%233178C6) ![Static Badge](https://img.shields.io/badge/Vue.js-grey?logo=vuedotjs&logoColor=%234FC08D)
+![Static Badge](https://img.shields.io/badge/Spring%20Boot-grey?logo=springboot) ![Static Badge](https://img.shields.io/badge/PostgreSQL-white?logo=postgresql)
+
 
 ## Links
 
