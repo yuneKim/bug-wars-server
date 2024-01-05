@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.security.Principal;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -57,6 +58,18 @@ public class ScriptControllerTests {
         response.andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers
                         .jsonPath("$.size()", CoreMatchers.is(3)));
+    }
+
+    @Test
+    public void getScript_returnsScript() throws Exception {
+        when(scriptService.getScript(Mockito.anyLong(), Mockito.any()))
+                .thenReturn(SCRIPT_1);
+
+        ResultActions response = mockMvc.perform(get("/api/scripts/{id}", "1"));
+
+        response.andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.raw", CoreMatchers.is(SCRIPT_1.getRaw())));
+
     }
 
 }
