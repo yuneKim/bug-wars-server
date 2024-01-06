@@ -1,7 +1,13 @@
 package net.crusadergames.bugwars.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import net.crusadergames.bugwars.dto.request.CreateScriptRequest;
 import net.crusadergames.bugwars.model.Script;
 import net.crusadergames.bugwars.model.auth.User;
+import net.crusadergames.bugwars.parser.BugAssemblyParseException;
+import net.crusadergames.bugwars.parser.BugAssemblyParser;
+import net.crusadergames.bugwars.parser.BugAssemblyParserFactory;
 import net.crusadergames.bugwars.repository.ScriptRepository;
 import net.crusadergames.bugwars.repository.auth.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -20,6 +27,12 @@ public class ScriptService {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    BugAssemblyParserFactory bugAssemblyParserFactory;
+
+    @Autowired
+    ObjectMapper objectMapper;
 
     public List<Script> getUserScripts(Principal principal) {
         User user = getUser(principal);
@@ -41,11 +54,45 @@ public class ScriptService {
         return script;
     }
 
+    public Script createScript(CreateScriptRequest request, Principal principal) {
+        Script script = new Script();
+        User user = getUser(principal);
+        BugAssemblyParser parser = bugAssemblyParserFactory.createInstance();
+
+        if (scriptRepository.existsByName(request.getName())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Script by this name already exists");
+        }
+        System.out.println(request);
+
+        List<Integer> byteCode;
+        try {
+            byteCode = parser.parse(request.getRaw());
+            script.setBytecodeValid(true);
+        } catch (BugAssemblyParseException e) {
+            byteCode = new ArrayList<>();
+            script.setBytecodeValid(false);
+        }
+
+        script.setUser(user);
+        script.setName(request.getName());
+        script.setRaw(request.getRaw());
+        System.out.println(byteCode);
+
+        try {
+            script.setBytecode(objectMapper.writeValueAsString(byteCode));
+        } catch (JsonProcessingException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong.");
+        }
+        return scriptRepository.save(script);
+    }
+
     private User getUser(Principal principal) {
         return userRepository.findByUsername(principal.getName()).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
                         "User does not exist."));
     }
+
+
 
 
 }
