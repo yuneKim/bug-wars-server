@@ -1,7 +1,10 @@
 package net.crusadergames.bugwars.service;
 
+import net.crusadergames.bugwars.dto.request.CreateScriptRequest;
 import net.crusadergames.bugwars.model.Script;
 import net.crusadergames.bugwars.model.auth.User;
+import net.crusadergames.bugwars.parser.BugAssemblyParser;
+import net.crusadergames.bugwars.parser.BugAssemblyParserFactory;
 import net.crusadergames.bugwars.repository.ScriptRepository;
 import net.crusadergames.bugwars.repository.auth.UserRepository;
 import org.assertj.core.api.Assertions;
@@ -28,12 +31,16 @@ public class ScriptServiceTests {
     private final Script SCRIPT_2 = new Script(2L, USER, "Sneaky Peeky", ":START :END", "03 050 20 50 03 06 10 50", true);
     private final Script SCRIPT_3 = new Script(3L, USER, "Burger Bite", ":START att ifEnemy bite", "05 30 0t 30 f05 52c go2", true);
 
+    private final CreateScriptRequest REQUEST = new CreateScriptRequest("Highway Robbery", ":START wiggle");
 
     @Mock
     private UserRepository userRepository;
 
     @Mock
     private ScriptRepository scriptRepository;
+
+    @Mock
+    private BugAssemblyParserFactory bugAssemblyParserFactory;
 
     @InjectMocks
     private ScriptService scriptService;
@@ -97,4 +104,16 @@ public class ScriptServiceTests {
                 .isInstanceOf(ResponseStatusException.class)
                 .hasFieldOrPropertyWithValue("status", HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @Test
+    public void createScript_throwsConflictErrorOnExistingName() {
+        Principal mockPrincipal = Mockito.mock(Principal.class);
+        when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.of(USER));
+        when(scriptRepository.existsByName(Mockito.any())).thenReturn(true);
+
+        Assertions.assertThatThrownBy(() -> scriptService.createScript(REQUEST, mockPrincipal))
+                .isInstanceOf(ResponseStatusException.class)
+                .hasFieldOrPropertyWithValue("status", HttpStatus.CONFLICT);
+    }
+
 }

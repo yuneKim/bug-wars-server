@@ -62,7 +62,6 @@ public class ScriptService {
         if (scriptRepository.existsByName(request.getName())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Script by this name already exists");
         }
-        System.out.println(request);
 
         List<Integer> byteCode;
         try {
@@ -76,13 +75,13 @@ public class ScriptService {
         script.setUser(user);
         script.setName(request.getName());
         script.setRaw(request.getRaw());
-        System.out.println(byteCode);
 
         try {
             script.setBytecode(objectMapper.writeValueAsString(byteCode));
         } catch (JsonProcessingException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong.");
         }
+
         return scriptRepository.save(script);
     }
 
