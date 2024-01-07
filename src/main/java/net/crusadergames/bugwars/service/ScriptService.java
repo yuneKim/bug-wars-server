@@ -18,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ScriptService {
@@ -30,9 +31,6 @@ public class ScriptService {
 
     @Autowired
     BugAssemblyParserFactory bugAssemblyParserFactory;
-
-    @Autowired
-    ObjectMapper objectMapper;
 
     public List<Script> getUserScripts(Principal principal) {
         User user = getUser(principal);
@@ -75,12 +73,7 @@ public class ScriptService {
         script.setUser(user);
         script.setName(request.getName());
         script.setRaw(request.getRaw());
-
-        try {
-            script.setBytecode(objectMapper.writeValueAsString(byteCode));
-        } catch (JsonProcessingException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong.");
-        }
+        script.setBytecode(String.format("[%s]", byteCode.stream().map(Object::toString).collect(Collectors.joining(", "))));
 
         return scriptRepository.save(script);
     }
