@@ -1,6 +1,7 @@
 package net.crusadergames.bugwars.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.crusadergames.bugwars.dto.request.CreateScriptRequest;
 import net.crusadergames.bugwars.model.Script;
 import net.crusadergames.bugwars.model.auth.User;
 import net.crusadergames.bugwars.service.ScriptService;
@@ -18,10 +19,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.security.Principal;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -69,6 +68,21 @@ public class ScriptControllerTests {
 
         response.andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.raw", CoreMatchers.is(SCRIPT_1.getRaw())));
+
+    }
+
+    @Test
+    public void createScript_returnsScript() throws Exception {
+        CreateScriptRequest createScriptRequest = new CreateScriptRequest("The Ol' Razzle Dazzle", ":START dance");
+        when(scriptService.createScript(Mockito.any(), Mockito.any()))
+                .thenReturn(SCRIPT_1);
+
+        ResultActions response = mockMvc.perform(post("/api/scripts")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(createScriptRequest)));
+
+        response.andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(SCRIPT_1.getName())));
 
     }
 
