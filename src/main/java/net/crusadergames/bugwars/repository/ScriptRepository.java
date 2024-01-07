@@ -13,4 +13,6 @@ public interface ScriptRepository extends JpaRepository<Script, Long> {
 
     List<Script> findByUser(User user);
 
+    Boolean existsByName(String name);
+
 }

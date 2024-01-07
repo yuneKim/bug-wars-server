@@ -41,7 +41,6 @@ public class Script {
     @Column(name = "bytecode", length = 10000)
     private String bytecode;
 
-    @NotBlank
     @Column(name = "is_bytecode_valid")
     private boolean isBytecodeValid;
 
