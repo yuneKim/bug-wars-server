@@ -22,8 +22,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @WebMvcTest(controllers = ScriptController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -84,6 +83,13 @@ public class ScriptControllerTests {
         response.andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(SCRIPT_1.getName())));
 
+    }
+
+    @Test
+    public void deleteScript_deletesAScript() throws Exception {
+        ResultActions response = mockMvc.perform(delete("/api/scripts/{id}", "1"));
+
+        response.andExpect(MockMvcResultMatchers.status().isNoContent());
     }
 
 }

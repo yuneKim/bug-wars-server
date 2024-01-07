@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 public class ScriptServiceTests {
@@ -157,6 +157,56 @@ public class ScriptServiceTests {
         Script createdScript = scriptService.createScript(request, mockPrincipal);
 
         Assertions.assertThat(createdScript.isBytecodeValid()).isFalse();
+    }
+
+    @Test
+    public void deleteScriptById_returnsForbiddenStatusWhenUserIdsDontMatch(){
+        Principal mockPrincipal = Mockito.mock(Principal.class);
+        when(mockPrincipal.getName()).thenReturn("Esteban");
+
+        User user = new User();
+        user.setId(2l);
+        USER.setId(1l);
+        when(userRepository.findByUsername("Esteban")).thenReturn(Optional.of(user));
+
+        when(scriptRepository.findById(Mockito.any())).thenReturn(Optional.of(SCRIPT_1));
+        ;
+
+        Assertions.assertThatThrownBy(() -> scriptService.deleteScriptById(1L, mockPrincipal))
+                .isInstanceOf(ResponseStatusException.class)
+                .hasFieldOrPropertyWithValue("status", HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void deleteScriptById_doesNotDeleteIfScriptDoesNotExist(){
+        Principal mockPrincipal = Mockito.mock(Principal.class);
+        when(mockPrincipal.getName()).thenReturn("Esteban");
+
+        User user = new User();
+        user.setId(1l);
+        USER.setId(1l);
+        when(userRepository.findByUsername("Esteban")).thenReturn(Optional.of(user));
+
+        when(scriptRepository.findById(Mockito.any())).thenReturn(Optional.empty());
+        scriptService.deleteScriptById(1L, mockPrincipal);
+
+        Mockito.verify(scriptRepository, times(0)).deleteById(Mockito.any());
+    }
+
+    @Test
+    public void deleteScriptById_deletesCorrectScript(){
+        Principal mockPrincipal = Mockito.mock(Principal.class);
+        when(mockPrincipal.getName()).thenReturn("Esteban");
+
+        User user = new User();
+        user.setId(1l);
+        USER.setId(1l);
+        when(userRepository.findByUsername("Esteban")).thenReturn(Optional.of(user));
+
+        when(scriptRepository.findById(Mockito.any())).thenReturn(Optional.of(SCRIPT_1));
+        scriptService.deleteScriptById(1L, mockPrincipal);
+
+        Mockito.verify(scriptRepository, times(1)).deleteById(Mockito.any());
     }
 
 }
