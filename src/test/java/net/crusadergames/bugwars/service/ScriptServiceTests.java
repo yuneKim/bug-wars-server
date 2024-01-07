@@ -1,6 +1,5 @@
 package net.crusadergames.bugwars.service;
 
-import net.crusadergames.bugwars.dto.request.BugAssemblyParseRequest;
 import net.crusadergames.bugwars.dto.request.CreateScriptRequest;
 import net.crusadergames.bugwars.model.Script;
 import net.crusadergames.bugwars.model.auth.User;
@@ -16,13 +15,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,10 +43,6 @@ public class ScriptServiceTests {
 
     @Mock
     private BugAssemblyParserFactory bugAssemblyParserFactory;
-
-    @Mock
-    private BugAssemblyParser bugAssemblyParser;
-
     @InjectMocks
     private ScriptService scriptService;
 
@@ -143,6 +137,26 @@ public class ScriptServiceTests {
         Script createdScript = scriptService.createScript(request, mockPrincipal);
 
         Assertions.assertThat(createdScript).isNotNull();
+    }
+
+    @Test
+    public void createScript_handlesInvalidByteCode() throws BugAssemblyParseException {
+        Principal mockPrincipal = Mockito.mock(Principal.class);
+        CreateScriptRequest request = new CreateScriptRequest("Highway Robbery", ":START\ngoto START");
+        BugAssemblyParser bugAssemblyParser = mock(BugAssemblyParser.class);
+        List<Integer> emptyList = new ArrayList<>();
+        Script testScript = new Script(1L, new User(), "Highway Snobbery", ":START wiggle", "", false);
+
+
+        when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.of(USER));
+        when(scriptRepository.existsByName(Mockito.any())).thenReturn(false);
+        when(bugAssemblyParserFactory.createInstance()).thenReturn(bugAssemblyParser);
+        when(bugAssemblyParser.parse(request.getRaw())).thenThrow(BugAssemblyParseException.class);
+        when(scriptRepository.save(Mockito.any(Script.class))).thenReturn(testScript);
+
+        Script createdScript = scriptService.createScript(request, mockPrincipal);
+
+        Assertions.assertThat(createdScript.isBytecodeValid()).isFalse();
     }
 
 }
