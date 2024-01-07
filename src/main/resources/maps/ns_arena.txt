@@ -1,0 +1,22 @@
+21,21,Gladiator Arena
+XXXXXXXXXXXXXXXXXXXXX
+XXXXXXXX     XXXXXXXX    
+XXXXX           XXXXX
+XXXX             XXXX
+XXX               XXX
+XX                 XX
+XX        0        XX
+XX                 XX
+X    0         1    X
+X                   X
+X    0         1    X
+X                   X
+X    0         1    X
+XX                 XX
+XX        1        XX
+XX                 XX
+XXX               XXX
+XXXX             XXXX  
+XXXXX           XXXXX
+XXXXXXXX     XXXXXXXX
+XXXXXXXXXXXXXXXXXXXXX
