@@ -16,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -74,6 +75,20 @@ public class ScriptService {
         script.setBytecode(String.format("[%s]", byteCode.stream().map(Object::toString).collect(Collectors.joining(", "))));
 
         return scriptRepository.save(script);
+    }
+
+    public void deleteScriptById(long scriptId, Principal principal){
+        User user = getUser(principal);
+        Optional<Script> existingScript = scriptRepository.findById(scriptId);
+
+        if(existingScript.isEmpty()){
+            return;
+        }
+
+        if(!existingScript.get().getUser().getId().equals(user.getId())){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This action cannot be done.");
+        }
+        scriptRepository.deleteById(scriptId);
     }
 
     private User getUser(Principal principal) {
