@@ -12,49 +12,44 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Bug implements Entity, Attackable {
-    private Map<Integer, Action> actions = new HashMap<>();
+
     private Map<Integer, Control> controls = new HashMap<>();
-    private String name;
+
+    private Entity[][] map;
     private int swarm;
-    private int[] bytecode = {13, 30, 6, 11, 35, 0, 14, 35, 0};
+    private int[] bytecode;
     private int index = 0;
-    private boolean bool = false;
+    private boolean bool = true;
     private Point coords;
     private Direction direction;
 
-    public Bug(Point coords, int swarm, Direction direction) {
+    public Bug(Entity[][] map, Point coords, int swarm, int[] bytecode, Direction direction) {
+        this.map = map;
         this.coords = coords;
         this.swarm = swarm;
+        this.bytecode = bytecode;
         this.direction = direction;
+
         init();
     }
 
-    public void takeTurn() {
+    public int getAction(Entity frontEntity) {
+        int result = -1;
         if (controls.containsKey(bytecode[index])) {
-            bool = !bool;
-            if (controls.get(bytecode[index]).call()) {
+            if (controls.get(bytecode[index]).call(frontEntity)) {
                 index = bytecode[index + 1];
-                takeTurn();
             } else {
                 increment(2);
-                takeTurn();
             }
-        } else if (actions.containsKey(bytecode[index])) {
-            actions.get(bytecode[index]).run();
-            increment(1);
+            return getAction(frontEntity);
         } else {
-            throw new RuntimeException("Invalid instruction: " + bytecode[index]);
+            result = bytecode[index];
+            increment(1);
         }
+        return result;
     }
 
     private void init() {
-        actions.put(0, this::noop);
-        actions.put(10, this::mov);
-        actions.put(11, this::rotr);
-        actions.put(12, this::rotl);
-        actions.put(13, this::att);
-        actions.put(14, this::eat);
-
         controls.put(30, this::ifEnemy);
         controls.put(31, this::ifAlly);
         controls.put(32, this::ifFood);
@@ -67,58 +62,28 @@ public class Bug implements Entity, Attackable {
         index = (index + n) % bytecode.length;
     }
 
-    private void noop() {
-        System.out.println("noop");
+
+    private boolean ifEnemy(Entity frontEntity) {
+        return frontEntity instanceof Bug && ((Bug) frontEntity).getSwarm() != swarm;
     }
 
-    private void mov() {
-        System.out.println("mov");
+    private boolean ifAlly(Entity frontEntity) {
+        return frontEntity instanceof Bug && ((Bug) frontEntity).getSwarm() == swarm;
     }
 
-    private void rotr() {
-        System.out.println("rotr");
+    private boolean ifFood(Entity frontEntity) {
+        return frontEntity instanceof Food;
     }
 
-    private void rotl() {
-        System.out.println("rotl");
+    private boolean ifEmpty(Entity frontEntity) {
+        return frontEntity == null;
     }
 
-    private void att() {
-        System.out.println("att");
+    private boolean ifWall(Entity frontEntity) {
+        return frontEntity instanceof Wall;
     }
 
-    private void eat() {
-        System.out.println("eat");
-    }
-
-    private boolean ifEnemy() {
-        System.out.println("ifEnemy");
-        return bool;
-    }
-
-    private boolean ifAlly() {
-        System.out.println("ifAlly");
-        return bool;
-    }
-
-    private boolean ifFood() {
-        System.out.println("ifFood");
-        return bool;
-    }
-
-    private boolean ifEmpty() {
-        System.out.println("ifEmpty");
-        return bool;
-    }
-
-    private boolean ifWall() {
-        System.out.println("ifWall");
-        return bool;
-    }
-
-    private boolean _goto() {
-        bool = !bool;
-        System.out.println("goto");
+    private boolean _goto(Entity frontEntity) {
         return true;
     }
 
@@ -138,13 +103,9 @@ public class Bug implements Entity, Attackable {
         return String.format("%s%s%s", color, dir, "\033[0m");
     }
 
-    @FunctionalInterface
-    interface Action {
-        void run();
-    }
 
     @FunctionalInterface
     interface Control {
-        boolean call();
+        boolean call(Entity frontEntity);
     }
 }

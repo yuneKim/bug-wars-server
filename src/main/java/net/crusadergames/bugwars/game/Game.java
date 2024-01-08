@@ -1,22 +1,31 @@
 package net.crusadergames.bugwars.game;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.stereotype.Component;
+import lombok.Data;
 
-@Component
+import java.util.List;
+
+@Data
 public class Game {
-    @Autowired
-    private ResourceLoader loader;
-    private GameMap map;
+    private static int MAX_MOVES = 30;
+
+    private final Battleground battleground;
+    private final List<Swarm> swarms;
+
+    public Game(Battleground battleground, List<Swarm> swarms) {
+        this.battleground = battleground;
+        this.swarms = swarms;
+
+    }
 
     public void play() {
-        map = GameMap
-                .load("classpath:maps/ns_fortress4.txt", loader)
-                .createSwarm("BLUE", new int[]{10})
-                .createSwarm("RED", new int[]{11})
-                .createSwarm("YELLOW", new int[]{11})
-                .createSwarm("GREEN", new int[]{11});
-        map.print();
+        battleground.print();
+
+        for (int i = 0; i < MAX_MOVES; i++) {
+            battleground.nextTick();
+            battleground.print();
+        }
+
     }
+
+
 }
