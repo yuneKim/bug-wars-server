@@ -1,13 +1,13 @@
 package net.crusadergames.bugwars.controller;
 
+import net.crusadergames.bugwars.dto.request.GameRequest;
+import net.crusadergames.bugwars.dto.response.GameResponse;
 import net.crusadergames.bugwars.game.Game;
 import net.crusadergames.bugwars.game.GameFactory;
 import net.crusadergames.bugwars.game.Swarm;
+import net.crusadergames.bugwars.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -17,6 +17,9 @@ import java.util.List;
 public class GameController {
     @Autowired
     GameFactory gameFactory;
+
+    @Autowired
+    GameService gameService;
 
     @GetMapping
     public void play() {
@@ -29,5 +32,10 @@ public class GameController {
 
         Game game = gameFactory.createInstance("ns_arena.txt", swarms);
         game.play();
+    }
+
+    @PostMapping
+    public GameResponse playGame(@RequestBody GameRequest gameRequest) {
+        return gameService.playGame(gameRequest);
     }
 }
