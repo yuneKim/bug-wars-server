@@ -1,5 +1,8 @@
-package net.crusadergames.bugwars.game;
+package net.crusadergames.bugwars.game.setup;
 
+import net.crusadergames.bugwars.game.Battleground;
+import net.crusadergames.bugwars.game.GameInitializationException;
+import net.crusadergames.bugwars.game.Swarm;
 import net.crusadergames.bugwars.game.entity.*;
 import org.springframework.core.io.Resource;
 
@@ -29,12 +32,12 @@ public class BattlegroundFactory {
     private void loadMapFromFile() {
         String[] lines;
         try {
-            lines = mapFile.getContentAsString(StandardCharsets.UTF_8).split("\n");
+            lines = mapFile.getContentAsString(StandardCharsets.UTF_8).split("\\R");
         } catch (IOException e) {
-            throw new RuntimeException("Failed to load map file.");
+            throw new GameInitializationException("Failed to load map file.");
         }
         String[] infoLine = lines[0].split(",");
-        mapName = infoLine[2];
+        mapName = infoLine[2].trim();
         int height = Integer.parseInt(infoLine[1]);
         int width = Integer.parseInt(infoLine[0]);
         grid = constructGrid(height, width, lines);
@@ -46,9 +49,9 @@ public class BattlegroundFactory {
             for (int x = 0; x < width; x++) {
                 Point point = new Point(x, y);
                 char c = lines[y + 1].charAt(x);
-                if (List.of('X', 'x').contains(c)) {
+                if (c == 'X') {
                     grid[y][x] = new Wall();
-                } else if (List.of('A', 'a').contains(c)) {
+                } else if (c == 'a') {
                     grid[y][x] = new Food();
                 } else if (List.of('0', '1', '2', '3').contains(c)) {
                     int swarm = Character.getNumericValue(c);

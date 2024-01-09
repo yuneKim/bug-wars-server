@@ -1,5 +1,6 @@
-package net.crusadergames.bugwars.game;
+package net.crusadergames.bugwars.game.setup;
 
+import net.crusadergames.bugwars.game.Swarm;
 import net.crusadergames.bugwars.game.entity.Bug;
 import net.crusadergames.bugwars.game.entity.Entity;
 
@@ -45,6 +46,7 @@ public class TurnOrderCalculator {
                 }
             }
         }
+
         return distanceBuckets;
     }
 

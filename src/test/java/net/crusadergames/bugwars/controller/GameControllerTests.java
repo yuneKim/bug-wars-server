@@ -2,8 +2,8 @@ package net.crusadergames.bugwars.controller;
 
 import net.crusadergames.bugwars.dto.request.GameRequest;
 import net.crusadergames.bugwars.dto.response.GameResponse;
-import net.crusadergames.bugwars.game.GameFactory;
 import net.crusadergames.bugwars.game.Swarm;
+import net.crusadergames.bugwars.game.setup.GameFactory;
 import net.crusadergames.bugwars.service.GameService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

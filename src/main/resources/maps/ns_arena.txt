@@ -1,6 +1,6 @@
 21,21,Gladiator Arena
 XXXXXXXXXXXXXXXXXXXXX
-XXXXXXXX     XXXXXXXX    
+XXXXXXXX     XXXXXXXX
 XXXXX           XXXXX
 XXXX             XXXX
 XXX               XXX

@@ -22,7 +22,7 @@ public class Game {
 
         for (int i = 0; i < MAX_MOVES; i++) {
             battleground.nextTick();
-            battleground.print();
+//            battleground.print();
         }
 
     }
