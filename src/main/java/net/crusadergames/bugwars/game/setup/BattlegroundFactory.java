@@ -1,6 +1,7 @@
 package net.crusadergames.bugwars.game.setup;
 
 import net.crusadergames.bugwars.game.Battleground;
+import net.crusadergames.bugwars.game.GameInitializationException;
 import net.crusadergames.bugwars.game.Swarm;
 import net.crusadergames.bugwars.game.entity.*;
 import org.springframework.core.io.Resource;
@@ -33,7 +34,7 @@ public class BattlegroundFactory {
         try {
             lines = mapFile.getContentAsString(StandardCharsets.UTF_8).split("\\R");
         } catch (IOException e) {
-            throw new RuntimeException("Failed to load map file.");
+            throw new GameInitializationException("Failed to load map file.");
         }
         String[] infoLine = lines[0].split(",");
         mapName = infoLine[2].trim();
