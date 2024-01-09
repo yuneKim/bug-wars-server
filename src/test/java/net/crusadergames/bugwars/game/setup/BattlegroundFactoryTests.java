@@ -78,4 +78,28 @@ public class BattlegroundFactoryTests {
         Assertions.assertThatThrownBy(() -> new BattlegroundFactory(mapFile, swarms).createBattleground())
                 .isInstanceOf(GameInitializationException.class);
     }
+
+    @Test
+    public void canHandleMapWithUndefinedSlope() {
+        Resource mapFile = loader.getResource(BASE_PATH + "ns_arena_mini2.txt");
+        List<Swarm> swarms = List.of(
+                new Swarm("Swarm 1", new int[]{10}),
+                new Swarm("Swarm 2", new int[]{10})
+        );
+        Battleground battleground = new BattlegroundFactory(mapFile, swarms).createBattleground();
+        Assertions.assertThat(battleground.getBugs().size()).isEqualTo(2);
+    }
+
+    @Test
+    public void canHandleMapThatRequiresComplexSorting() {
+        Resource mapFile = loader.getResource(BASE_PATH + "ns_fortress4.txt");
+        List<Swarm> swarms = List.of(
+                new Swarm("Swarm 1", new int[]{10}),
+                new Swarm("Swarm 2", new int[]{10}),
+                new Swarm("Swarm 3", new int[]{10}),
+                new Swarm("Swarm 4", new int[]{10})
+        );
+        Battleground battleground = new BattlegroundFactory(mapFile, swarms).createBattleground();
+        Assertions.assertThat(battleground.getBugs().size()).isEqualTo(44);
+    }
 }

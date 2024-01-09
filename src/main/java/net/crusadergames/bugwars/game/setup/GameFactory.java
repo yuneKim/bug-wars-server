@@ -2,6 +2,7 @@ package net.crusadergames.bugwars.game.setup;
 
 import net.crusadergames.bugwars.game.Battleground;
 import net.crusadergames.bugwars.game.Game;
+import net.crusadergames.bugwars.game.GameInitializationException;
 import net.crusadergames.bugwars.game.Swarm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -24,10 +25,9 @@ public class GameFactory {
 
         try {
             MapValidator mapValidator = new MapValidator(mapFile.getContentAsString(StandardCharsets.UTF_8).split("\\R"));
-            boolean mapGood = mapValidator.validate();
-            System.out.println(mapGood);
+            if (!mapValidator.validate()) throw new GameInitializationException("Invalid Map");
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new GameInitializationException("Failed to load map file.");
         }
 
         Battleground battleground = new BattlegroundFactory(mapFile, swarms).createBattleground();
