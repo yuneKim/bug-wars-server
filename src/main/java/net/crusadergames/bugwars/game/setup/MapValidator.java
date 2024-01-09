@@ -40,32 +40,43 @@ public class MapValidator {
             width = Integer.parseInt(tokens[0].trim());
             height = Integer.parseInt(tokens[1].trim());
         } catch (NumberFormatException e) {
+            System.err.println("Title line bad");
             return false;
         }
         return true;
     }
 
     private boolean correctLineCount() {
-        return lines.length == height;
+        if (lines.length != height) {
+            System.err.println("Line count incorrect");
+            return false;
+        }
+        return true;
     }
 
     private boolean mapContentIsOk() {
         for (int y = 0; y < lines.length; y++) {
             String line = lines[y].trim();
-            if (line.length() != width) return false;
+            if (line.length() != width) {
+                System.err.println("Incorrect line width");
+                return false;
+            }
 
             if (line.charAt(0) != 'X' || line.charAt(line.length() - 1) != 'X') {
+                System.err.println("Side wall missing");
                 return false;
             }
 
             for (int x = 0; x < line.length(); x++) {
                 char c = line.charAt(x);
                 if (!List.of('X', 'a', '0', '1', '2', '3', ' ').contains(c)) {
+                    System.err.println("Title Line Bad");
                     return false;
                 }
 
                 if (y == 0 || y == lines.length - 1) {
                     if (c != 'X') {
+                        System.err.println("Top or bottom wall missing");
                         return false;
                     }
                 }
@@ -104,8 +115,10 @@ public class MapValidator {
             Map<Integer, Integer> bugCounts = bugList.stream()
                     .collect(Collectors.<Bug, Integer, Integer>toMap(Bug::getSwarm, (bug) -> 1, Integer::sum));
 
-            if (bugCounts.keySet().size() != swarms.size() || bugCounts.values().stream().distinct().count() > 1)
+            if (bugCounts.keySet().size() != swarms.size() || bugCounts.values().stream().distinct().count() > 1) {
+                System.err.println("Bug spawns not reflected properly and/or unequal swarm sizes");
                 return false;
+            }
         }
 
         return true;
@@ -115,8 +128,8 @@ public class MapValidator {
         boolean reflectionGood = true;
         boolean twistedReflectionGood = true;
         for (int y = 0; y < lines.length / 2; y++) {
-            String topLine = lines[y].replaceAll("\\d", " ");
-            String bottomLine = lines[lines.length - 1 - y].replaceAll("\\d", " ");
+            String topLine = lines[y].replaceAll("\\d", " ").trim();
+            String bottomLine = lines[lines.length - 1 - y].replaceAll("\\d", " ").trim();
 
             if (!topLine.equals(bottomLine)) {
                 reflectionGood = false;
@@ -126,6 +139,8 @@ public class MapValidator {
                 twistedReflectionGood = false;
             }
         }
+        if (!reflectionGood && !twistedReflectionGood)
+            System.err.println("Map not symmetrical");
 
         return reflectionGood || twistedReflectionGood;
     }

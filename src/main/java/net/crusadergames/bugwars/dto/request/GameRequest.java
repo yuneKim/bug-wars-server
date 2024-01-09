@@ -14,7 +14,7 @@ import java.util.List;
 public class GameRequest {
 
     @NotBlank
-    private List<Swarm> swarm;
+    private List<Swarm> swarms;
 
     @NotBlank
     private String mapName;

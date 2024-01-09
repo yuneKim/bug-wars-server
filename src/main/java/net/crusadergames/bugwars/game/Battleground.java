@@ -4,6 +4,7 @@ import lombok.Data;
 import net.crusadergames.bugwars.game.entity.*;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,15 +25,18 @@ public class Battleground {
         init();
     }
 
-    public void nextTick() {
+    public List<ActionSummary> nextTick() {
+        List<ActionSummary> actionsTaken = new ArrayList<>();
         for (index = 0; index < bugs.size(); index++) {
             Bug bug = bugs.get(index);
             Point bugFrontCoords = bug.getDirection().forward(bug.getCoords());
             int action = bug.getAction(getEntityAtCoords(bugFrontCoords));
             if (!actions.containsKey(action)) throw new RuntimeException("Invalid action.");
 
+            actionsTaken.add(new ActionSummary(bug.getCoords(), action));
             actions.get(action).run(bug);
         }
+        return actionsTaken;
     }
 
     public void print() {

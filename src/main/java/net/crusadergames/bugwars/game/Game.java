@@ -6,25 +6,25 @@ import java.util.List;
 
 @Data
 public class Game {
-    private static int MAX_MOVES = 30;
+    private static int MAX_MOVES = 3000;
 
     private final Battleground battleground;
     private final List<Swarm> swarms;
+    private final GameReplay replay;
 
     public Game(Battleground battleground, List<Swarm> swarms) {
         this.battleground = battleground;
         this.swarms = swarms;
 
+        replay = new GameReplay(battleground.getName(), battleground.getGrid());
     }
 
-    public void play() {
-        battleground.print();
-
+    public GameReplay play() {
         for (int i = 0; i < MAX_MOVES; i++) {
-            battleground.nextTick();
-//            battleground.print();
+            List<ActionSummary> tickActions = battleground.nextTick();
+            replay.addTickActions(tickActions);
         }
-
+        return replay;
     }
 
 
