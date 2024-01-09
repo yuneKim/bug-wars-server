@@ -45,6 +45,7 @@ public class TurnOrderCalculator {
                 }
             }
         }
+
         return distanceBuckets;
     }
 

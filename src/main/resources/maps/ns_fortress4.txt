@@ -1,11 +1,11 @@
 31,31,Fortress
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-X       X X         X       X X
+X       X X         X X       X
 X         X XX000XX X         X
 X         X 0 0 0 0 X         X
-X   X X   X         X  X X    X
-X     X     X     X    X      X
-X   XXX   X 3     3 X  XXX    X
+X   X X   X         X   X X   X
+X     X     X     X     X     X
+X   XXX   X 3     3 X   XXX   X
 X         X         X         X
 XX       1X         X0       XX
 X       1 X         X 0       X

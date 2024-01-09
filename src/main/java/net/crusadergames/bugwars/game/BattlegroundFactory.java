@@ -29,7 +29,7 @@ public class BattlegroundFactory {
     private void loadMapFromFile() {
         String[] lines;
         try {
-            lines = mapFile.getContentAsString(StandardCharsets.UTF_8).split("\n");
+            lines = mapFile.getContentAsString(StandardCharsets.UTF_8).split("\\R");
         } catch (IOException e) {
             throw new RuntimeException("Failed to load map file.");
         }
