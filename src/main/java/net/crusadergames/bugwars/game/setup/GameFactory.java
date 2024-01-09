@@ -1,5 +1,8 @@
-package net.crusadergames.bugwars.game;
+package net.crusadergames.bugwars.game.setup;
 
+import net.crusadergames.bugwars.game.Battleground;
+import net.crusadergames.bugwars.game.Game;
+import net.crusadergames.bugwars.game.Swarm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -27,11 +30,9 @@ public class GameFactory {
             throw new RuntimeException(e);
         }
 
-//        Battleground battleground = new BattlegroundFactory(mapFile, swarms).createBattleground();
-//
-//        return new Game(battleground, swarms);
+        Battleground battleground = new BattlegroundFactory(mapFile, swarms).createBattleground();
 
-        return null;
+        return new Game(battleground, swarms);
     }
 
 }

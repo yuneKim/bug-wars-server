@@ -1,8 +1,8 @@
 package net.crusadergames.bugwars.controller;
 
 import net.crusadergames.bugwars.game.Game;
-import net.crusadergames.bugwars.game.GameFactory;
 import net.crusadergames.bugwars.game.Swarm;
+import net.crusadergames.bugwars.game.setup.GameFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;

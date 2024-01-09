@@ -1,4 +1,4 @@
-package net.crusadergames.bugwars.game;
+package net.crusadergames.bugwars.game.setup;
 
 import net.crusadergames.bugwars.game.entity.Bug;
 import net.crusadergames.bugwars.game.entity.Direction;
@@ -37,8 +37,8 @@ public class MapValidator {
     private boolean titleLineOk() {
         String[] tokens = titleLine.split(",");
         try {
-            width = Integer.parseInt(tokens[0]);
-            height = Integer.parseInt(tokens[1]);
+            width = Integer.parseInt(tokens[0].trim());
+            height = Integer.parseInt(tokens[1].trim());
         } catch (NumberFormatException e) {
             return false;
         }
@@ -54,19 +54,18 @@ public class MapValidator {
             String line = lines[y].trim();
             if (line.length() != width) return false;
 
-            if (!(List.of('X', 'x').contains(line.charAt(0)) &&
-                    List.of('X', 'x').contains(line.charAt(line.length() - 1)))) {
+            if (line.charAt(0) != 'X' || line.charAt(line.length() - 1) != 'X') {
                 return false;
             }
 
             for (int x = 0; x < line.length(); x++) {
                 char c = line.charAt(x);
-                if (!List.of('X', 'x', 'a', 'A', '0', '1', '2', '3', ' ').contains(c)) {
+                if (!List.of('X', 'a', '0', '1', '2', '3', ' ').contains(c)) {
                     return false;
                 }
 
                 if (y == 0 || y == lines.length - 1) {
-                    if (!List.of('X', 'x').contains(c)) {
+                    if (c != 'X') {
                         return false;
                     }
                 }
