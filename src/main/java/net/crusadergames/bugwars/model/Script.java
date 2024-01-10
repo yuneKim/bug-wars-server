@@ -1,12 +1,10 @@
 package net.crusadergames.bugwars.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.crusadergames.bugwars.model.auth.User;
@@ -45,4 +43,12 @@ public class Script {
     @Column(name = "is_bytecode_valid")
     private boolean isBytecodeValid;
 
+    public int[] deserializeBytecode() {
+        String[] ints = bytecode.replaceAll("[\\[\\]]", "").split(", ");
+        int[] result = new int[ints.length];
+        for (int i = 0; i < ints.length; i++) {
+            result[i] = Integer.parseInt(ints[i]);
+        }
+        return result;
+    }
 }
