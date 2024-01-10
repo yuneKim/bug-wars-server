@@ -1,7 +1,11 @@
 package net.crusadergames.bugwars.service;
 
+import net.crusadergames.bugwars.dto.request.CreateScriptRequest;
 import net.crusadergames.bugwars.model.Script;
 import net.crusadergames.bugwars.model.auth.User;
+import net.crusadergames.bugwars.parser.BugAssemblyParseException;
+import net.crusadergames.bugwars.parser.BugAssemblyParser;
+import net.crusadergames.bugwars.parser.BugAssemblyParserFactory;
 import net.crusadergames.bugwars.repository.ScriptRepository;
 import net.crusadergames.bugwars.repository.auth.UserRepository;
 import org.assertj.core.api.Assertions;
@@ -13,12 +17,15 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
+import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 public class ScriptServiceTests {
@@ -28,13 +35,14 @@ public class ScriptServiceTests {
     private final Script SCRIPT_2 = new Script(2L, USER, "Sneaky Peeky", ":START :END", "03 050 20 50 03 06 10 50", true);
     private final Script SCRIPT_3 = new Script(3L, USER, "Burger Bite", ":START att ifEnemy bite", "05 30 0t 30 f05 52c go2", true);
 
-
     @Mock
     private UserRepository userRepository;
 
     @Mock
     private ScriptRepository scriptRepository;
 
+    @Mock
+    private BugAssemblyParserFactory bugAssemblyParserFactory;
     @InjectMocks
     private ScriptService scriptService;
 
@@ -97,4 +105,108 @@ public class ScriptServiceTests {
                 .isInstanceOf(ResponseStatusException.class)
                 .hasFieldOrPropertyWithValue("status", HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @Test
+    public void createScript_respondsWithConflictStatusOnDuplicateName() {
+        CreateScriptRequest request = new CreateScriptRequest("Highway Robbery", ":START\ngoto START");
+
+
+        Principal mockPrincipal = Mockito.mock(Principal.class);
+        when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.of(USER));
+        when(scriptRepository.existsByName(Mockito.any())).thenReturn(true);
+
+        Assertions.assertThatThrownBy(() -> scriptService.createScript(request, mockPrincipal))
+                .isInstanceOf(ResponseStatusException.class)
+                .hasFieldOrPropertyWithValue("status", HttpStatus.CONFLICT);
+    }
+
+    @Test
+    public void createScript_returnsCreatedScript() throws BugAssemblyParseException, JsonProcessingException {
+        List<Integer> expectedResult = List.of(35, 0);
+        Principal mockPrincipal = Mockito.mock(Principal.class);
+        BugAssemblyParser bugAssemblyParser = mock(BugAssemblyParser.class);
+        CreateScriptRequest request = new CreateScriptRequest("Highway Robbery", ":START\ngoto START");
+
+
+        when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.of(USER));
+        when(scriptRepository.existsByName(Mockito.any())).thenReturn(false);
+        when(bugAssemblyParserFactory.createInstance()).thenReturn(bugAssemblyParser);
+        when(bugAssemblyParser.parse(request.getRaw())).thenReturn(expectedResult);
+        when(scriptRepository.save(Mockito.any(Script.class))).thenReturn(SCRIPT_1);
+
+        Script createdScript = scriptService.createScript(request, mockPrincipal);
+
+        Assertions.assertThat(createdScript).isNotNull();
+    }
+
+    @Test
+    public void createScript_handlesInvalidByteCode() throws BugAssemblyParseException {
+        Principal mockPrincipal = Mockito.mock(Principal.class);
+        CreateScriptRequest request = new CreateScriptRequest("Highway Robbery", ":START\ngoto START");
+        BugAssemblyParser bugAssemblyParser = mock(BugAssemblyParser.class);
+        List<Integer> emptyList = new ArrayList<>();
+        Script testScript = new Script(1L, new User(), "Highway Snobbery", ":START wiggle", "", false);
+
+
+        when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.of(USER));
+        when(scriptRepository.existsByName(Mockito.any())).thenReturn(false);
+        when(bugAssemblyParserFactory.createInstance()).thenReturn(bugAssemblyParser);
+        when(bugAssemblyParser.parse(request.getRaw())).thenThrow(BugAssemblyParseException.class);
+        when(scriptRepository.save(Mockito.any(Script.class))).thenReturn(testScript);
+
+        Script createdScript = scriptService.createScript(request, mockPrincipal);
+
+        Assertions.assertThat(createdScript.isBytecodeValid()).isFalse();
+    }
+
+    @Test
+    public void deleteScriptById_returnsForbiddenStatusWhenUserIdsDontMatch(){
+        Principal mockPrincipal = Mockito.mock(Principal.class);
+        when(mockPrincipal.getName()).thenReturn("Esteban");
+
+        User user = new User();
+        user.setId(2l);
+        USER.setId(1l);
+        when(userRepository.findByUsername("Esteban")).thenReturn(Optional.of(user));
+
+        when(scriptRepository.findById(Mockito.any())).thenReturn(Optional.of(SCRIPT_1));
+        ;
+
+        Assertions.assertThatThrownBy(() -> scriptService.deleteScriptById(1L, mockPrincipal))
+                .isInstanceOf(ResponseStatusException.class)
+                .hasFieldOrPropertyWithValue("status", HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void deleteScriptById_doesNotDeleteIfScriptDoesNotExist(){
+        Principal mockPrincipal = Mockito.mock(Principal.class);
+        when(mockPrincipal.getName()).thenReturn("Esteban");
+
+        User user = new User();
+        user.setId(1l);
+        USER.setId(1l);
+        when(userRepository.findByUsername("Esteban")).thenReturn(Optional.of(user));
+
+        when(scriptRepository.findById(Mockito.any())).thenReturn(Optional.empty());
+        scriptService.deleteScriptById(1L, mockPrincipal);
+
+        Mockito.verify(scriptRepository, times(0)).deleteById(Mockito.any());
+    }
+
+    @Test
+    public void deleteScriptById_deletesCorrectScript(){
+        Principal mockPrincipal = Mockito.mock(Principal.class);
+        when(mockPrincipal.getName()).thenReturn("Esteban");
+
+        User user = new User();
+        user.setId(1l);
+        USER.setId(1l);
+        when(userRepository.findByUsername("Esteban")).thenReturn(Optional.of(user));
+
+        when(scriptRepository.findById(Mockito.any())).thenReturn(Optional.of(SCRIPT_1));
+        scriptService.deleteScriptById(1L, mockPrincipal);
+
+        Mockito.verify(scriptRepository, times(1)).deleteById(Mockito.any());
+    }
+
 }

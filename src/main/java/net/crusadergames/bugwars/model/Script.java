@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import net.crusadergames.bugwars.model.auth.User;
 
 @Entity
@@ -19,6 +17,7 @@ public class Script {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ToString.Exclude
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "user_id", nullable = false)
@@ -39,7 +38,6 @@ public class Script {
     @Column(name = "bytecode", length = 10000)
     private String bytecode;
 
-    @NotBlank
     @Column(name = "is_bytecode_valid")
     private boolean isBytecodeValid;
 
