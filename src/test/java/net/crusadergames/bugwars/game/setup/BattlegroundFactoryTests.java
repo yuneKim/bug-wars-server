@@ -1,7 +1,6 @@
 package net.crusadergames.bugwars.game.setup;
 
 import net.crusadergames.bugwars.game.Battleground;
-import net.crusadergames.bugwars.game.GameInitializationException;
 import net.crusadergames.bugwars.game.Swarm;
 import net.crusadergames.bugwars.game.entity.Bug;
 import net.crusadergames.bugwars.game.entity.Food;
@@ -24,7 +23,6 @@ public class BattlegroundFactoryTests {
     @BeforeAll
     public static void setup() {
         loader = new DefaultResourceLoader();
-
     }
 
     @Test
@@ -38,7 +36,6 @@ public class BattlegroundFactoryTests {
         );
 
         Battleground battleground = new BattlegroundFactory(mapFile, swarms).createBattleground();
-        System.out.println(battleground);
         Assertions.assertThat(battleground.getBugs().size()).isEqualTo(12);
         Assertions.assertThat(battleground.getName()).isEqualTo("Arena Mini");
         Assertions.assertThat(List.of(battleground.getGrid()[0])).extracting("class")
@@ -59,7 +56,6 @@ public class BattlegroundFactoryTests {
         );
 
         Battleground battleground = new BattlegroundFactory(mapFile, swarms).createBattleground();
-        System.out.println(battleground);
         Assertions.assertThat(battleground.getBugs().size()).isEqualTo(9);
         Assertions.assertThat(Stream.of(battleground.getGrid()[1]).filter(Objects::nonNull).toList()).extracting("class")
                 .contains(Wall.class, Bug.class).hasSize(6);

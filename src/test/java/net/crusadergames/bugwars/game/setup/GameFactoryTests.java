@@ -1,7 +1,6 @@
 package net.crusadergames.bugwars.game.setup;
 
 import net.crusadergames.bugwars.game.Game;
-import net.crusadergames.bugwars.game.GameInitializationException;
 import net.crusadergames.bugwars.game.Swarm;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;

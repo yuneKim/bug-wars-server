@@ -15,22 +15,19 @@ public class Bug implements Entity, Attackable {
 
     private Map<Integer, Control> controls = new HashMap<>();
 
-    private Entity[][] map;
     private int swarm;
     private int[] bytecode;
     private int index = 0;
-    private boolean bool = true;
     private Point coords;
     private Direction direction;
 
-    public Bug(Entity[][] map, Point coords, int swarm, int[] bytecode, Direction direction) {
-        this.map = map;
+    public Bug(Point coords, int swarm, int[] bytecode, Direction direction) {
         this.coords = coords;
         this.swarm = swarm;
         this.bytecode = bytecode;
         this.direction = direction;
 
-        init();
+        populateControls();
     }
 
     public int getAction(Entity frontEntity) {
@@ -49,7 +46,7 @@ public class Bug implements Entity, Attackable {
         return result;
     }
 
-    private void init() {
+    private void populateControls() {
         controls.put(30, this::ifEnemy);
         controls.put(31, this::ifAlly);
         controls.put(32, this::ifFood);

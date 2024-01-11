@@ -1,6 +1,7 @@
 package net.crusadergames.bugwars.game;
 
 import lombok.Data;
+import net.crusadergames.bugwars.annotation.ExcludeFromJacocoGeneratedReport;
 import net.crusadergames.bugwars.game.entity.*;
 
 import java.awt.*;
@@ -39,6 +40,7 @@ public class Battleground {
         return actionsTaken;
     }
 
+    @ExcludeFromJacocoGeneratedReport
     public void print() {
         for (Entity[] entities : grid) {
             for (Entity e : entities) {
@@ -89,9 +91,10 @@ public class Battleground {
         if (!(target instanceof Attackable)) return;
 
         if (target instanceof Bug) {
+            if (bugs.indexOf(target) < index) index--;
             bugs.remove(target);
             grid[bugFrontCoords.y][bugFrontCoords.x] = new Food();
-        } else {
+        } else if (target instanceof Food) {
             grid[bugFrontCoords.y][bugFrontCoords.x] = null;
         }
     }
@@ -102,12 +105,12 @@ public class Battleground {
         if (!(target instanceof Food)) return;
 
         Bug newSpawn = new Bug(
-                grid,
                 bugFrontCoords,
                 bug.getSwarm(),
                 bug.getBytecode(),
                 Direction.faceCenter(bugFrontCoords, grid.length, grid[0].length)
         );
+
         grid[bugFrontCoords.y][bugFrontCoords.x] = newSpawn;
         bugs.add(index, newSpawn);
         index++;

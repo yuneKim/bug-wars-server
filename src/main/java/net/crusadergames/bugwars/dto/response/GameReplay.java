@@ -1,6 +1,7 @@
-package net.crusadergames.bugwars.game;
+package net.crusadergames.bugwars.dto.response;
 
 import lombok.Data;
+import net.crusadergames.bugwars.game.ActionSummary;
 import net.crusadergames.bugwars.game.entity.Bug;
 import net.crusadergames.bugwars.game.entity.Direction;
 import net.crusadergames.bugwars.game.entity.Entity;

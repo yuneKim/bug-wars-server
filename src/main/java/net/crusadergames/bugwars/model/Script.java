@@ -4,7 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import net.crusadergames.bugwars.model.auth.User;
 
 @Entity
@@ -40,6 +43,12 @@ public class Script {
 
     @Column(name = "is_bytecode_valid")
     private boolean isBytecodeValid;
+
+    public Script(Long id, String name, String bytecode) {
+        this.id = id;
+        this.name = name;
+        this.bytecode = bytecode;
+    }
 
     public int[] deserializeBytecode() {
         String[] ints = bytecode.replaceAll("[\\[\\]]", "").split(", ");

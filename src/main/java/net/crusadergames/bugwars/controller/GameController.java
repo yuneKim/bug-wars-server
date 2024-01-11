@@ -1,7 +1,7 @@
 package net.crusadergames.bugwars.controller;
 
 import net.crusadergames.bugwars.dto.request.GameRequest;
-import net.crusadergames.bugwars.game.GameReplay;
+import net.crusadergames.bugwars.dto.response.GameReplay;
 import net.crusadergames.bugwars.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

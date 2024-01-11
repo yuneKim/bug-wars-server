@@ -1,7 +1,6 @@
 package net.crusadergames.bugwars.game.setup;
 
 import net.crusadergames.bugwars.game.Battleground;
-import net.crusadergames.bugwars.game.GameInitializationException;
 import net.crusadergames.bugwars.game.Swarm;
 import net.crusadergames.bugwars.game.entity.*;
 import org.springframework.core.io.Resource;
@@ -58,7 +57,6 @@ public class BattlegroundFactory {
                     if (swarms.size() <= swarm) continue;
 
                     Bug bug = new Bug(
-                            grid,
                             point,
                             swarm,
                             swarms.get(swarm).getBytecode(),

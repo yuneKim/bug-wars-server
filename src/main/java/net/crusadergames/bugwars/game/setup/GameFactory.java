@@ -2,7 +2,6 @@ package net.crusadergames.bugwars.game.setup;
 
 import net.crusadergames.bugwars.game.Battleground;
 import net.crusadergames.bugwars.game.Game;
-import net.crusadergames.bugwars.game.GameInitializationException;
 import net.crusadergames.bugwars.game.Swarm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -16,6 +15,7 @@ import java.util.List;
 @Component
 public class GameFactory {
     static private final String BASE_PATH = "classpath:maps/";
+    static private final int MAX_MOVES = 100;
 
     @Autowired
     ResourceLoader loader;
@@ -32,7 +32,7 @@ public class GameFactory {
 
         Battleground battleground = new BattlegroundFactory(mapFile, swarms).createBattleground();
 
-        return new Game(battleground, swarms);
+        return new Game(battleground, swarms, MAX_MOVES);
     }
 
 }

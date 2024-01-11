@@ -2,7 +2,7 @@ package net.crusadergames.bugwars.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.crusadergames.bugwars.dto.request.GameRequest;
-import net.crusadergames.bugwars.game.GameReplay;
+import net.crusadergames.bugwars.dto.response.GameReplay;
 import net.crusadergames.bugwars.game.setup.GameFactory;
 import net.crusadergames.bugwars.service.GameService;
 import org.junit.jupiter.api.Test;
@@ -39,7 +39,7 @@ public class GameControllerTests {
 
     @Test
     public void playGame_returnsGameResponse() throws Exception {
-        GameRequest createGameRequest = new GameRequest(List.of(Mockito.anyLong()), "Columbus");
+        GameRequest createGameRequest = new GameRequest(List.of(1L, 2L), "Columbus");
         GameReplay gameReplay = Mockito.mock(GameReplay.class);
         when(gameService.playGame(Mockito.any())).thenReturn(gameReplay);
 
