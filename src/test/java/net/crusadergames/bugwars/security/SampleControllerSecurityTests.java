@@ -1,10 +1,8 @@
 package net.crusadergames.bugwars.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.crusadergames.bugwars.model.SampleString;
 import net.crusadergames.bugwars.repository.auth.RoleRepository;
 import net.crusadergames.bugwars.repository.auth.UserRepository;
-import net.crusadergames.bugwars.service.SampleStringService;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
