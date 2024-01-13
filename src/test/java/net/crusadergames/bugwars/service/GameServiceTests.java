@@ -50,7 +50,7 @@ public class GameServiceTests {
         when(scriptRepository.findById(1L)).thenReturn(Optional.of(script1));
         when(scriptRepository.findById(2L)).thenReturn(Optional.of(script2));
         when(gameFactory.createInstance(mapName, swarms)).thenReturn(game);
-        when(game.play()).thenReturn(new GameReplay(null, new Entity[][]{}));
+        when(game.play()).thenReturn(new GameReplay(null, new Entity[][]{}, null));
 
         GameReplay replay = gameService.playGame(gameRequest);
 

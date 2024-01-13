@@ -2,6 +2,7 @@ package net.crusadergames.bugwars.dto.response;
 
 import lombok.Data;
 import net.crusadergames.bugwars.game.ActionSummary;
+import net.crusadergames.bugwars.game.Swarm;
 import net.crusadergames.bugwars.game.entity.Bug;
 import net.crusadergames.bugwars.game.entity.Direction;
 import net.crusadergames.bugwars.game.entity.Entity;
@@ -29,10 +30,12 @@ public class GameReplay {
     private final String map;
     private final String battleground;
     private final List<List<ActionSummary>> replay;
+    private final List<Swarm> swarms;
 
-    public GameReplay(String map, Entity[][] grid) {
+    public GameReplay(String map, Entity[][] grid, List<Swarm> swarms) {
         this.map = map;
         this.battleground = squashBattleground(grid);
+        this.swarms = swarms;
         this.replay = new ArrayList<>();
     }
 

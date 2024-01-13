@@ -17,7 +17,7 @@ public class Game {
         this.swarms = swarms;
         this.maxMoves = maxMoves;
 
-        replay = new GameReplay(battleground.getName(), battleground.getGrid());
+        replay = new GameReplay(battleground.getName(), battleground.getGrid(), swarms);
     }
 
     public GameReplay play() {
