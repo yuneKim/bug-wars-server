@@ -1,0 +1,8 @@
+7,7,Arena Mini
+XXXXXXX
+X00 11X
+X0 a 1X
+X   a X
+X2   3X
+X22 33X
+XXXXXXX

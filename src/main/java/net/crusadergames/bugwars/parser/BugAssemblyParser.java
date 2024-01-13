@@ -124,12 +124,14 @@ public class BugAssemblyParser {
     }
 
     private void processFlowControl(String[] tokens) throws BugAssemblyParseException {
-        if (tokens.length > 2) {
+        if (tokens.length != 2) {
+            String tokenError = tokens.length > 2 ? "Too many tokens" : "Too few tokens";
             throw new BugAssemblyParseException(
                     String.format(
-                            "Problem on line %s: '%s'. Too many tokens. Expected 2. Found %s.",
+                            "Problem on line %s: '%s'. %s. Expected 2. Found %s.",
                             context.getLineNumber(),
                             context.getLine(),
+                            tokenError,
                             tokens.length
                     )
             );

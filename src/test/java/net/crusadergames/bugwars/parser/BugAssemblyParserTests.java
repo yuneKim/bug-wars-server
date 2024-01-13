@@ -137,6 +137,19 @@ public class BugAssemblyParserTests {
     @Test
     public void throwsBugAssemblyParserExceptionWhenMissingLabelTarget() {
         String code = """
+                :BEGIN
+                    att
+                    mov
+                    ifAlly""";
+        Assertions.assertThatThrownBy(() -> parser.parse(code))
+                .isInstanceOf(BugAssemblyParseException.class)
+                .hasMessageMatching("Problem on line (\\d+): '[^']+'. Too few tokens. " +
+                        "Expected 2. Found (\\d+).");
+    }
+
+    @Test
+    public void throwsBugAssemblyParserExceptionWhenLabelTargetIsNotDefined() {
+        String code = """
                 :START
                   mov # this is a comment
                   rotr
