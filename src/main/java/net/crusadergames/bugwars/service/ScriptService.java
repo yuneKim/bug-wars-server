@@ -77,15 +77,28 @@ public class ScriptService {
         return scriptRepository.save(script);
     }
 
-    public void deleteScriptById(long scriptId, Principal principal){
+    public void updateScript(long scriptId, Principal principal) {
+        User user = getUser(principal);
+        Optional<Script> existingScript = scriptRepository.findById(scriptId);
+        if (existingScript.isEmpty()) {
+            return;
+        }
+        if (!existingScript.get().getUser().getId().equals(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This user does not have access to this script.");
+        }
+        Script scriptToSave = existingScript.get();
+        scriptRepository.save(scriptToSave);
+    }
+
+    public void deleteScriptById(long scriptId, Principal principal) {
         User user = getUser(principal);
         Optional<Script> existingScript = scriptRepository.findById(scriptId);
 
-        if(existingScript.isEmpty()){
+        if (existingScript.isEmpty()) {
             return;
         }
 
-        if(!existingScript.get().getUser().getId().equals(user.getId())){
+        if (!existingScript.get().getUser().getId().equals(user.getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This action cannot be done.");
         }
         scriptRepository.deleteById(scriptId);
@@ -96,8 +109,6 @@ public class ScriptService {
                 new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
                         "User does not exist."));
     }
-
-
 
 
 }

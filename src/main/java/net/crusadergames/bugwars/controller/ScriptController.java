@@ -36,6 +36,11 @@ public class ScriptController {
         return scriptService.createScript(request, principal);
     }
 
+    @PutMapping(path="/{scriptId}")
+    public void updateScript(@PathVariable long scriptId, Principal principal){
+        scriptService.updateScript(scriptId, principal);
+    }
+
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping(path="/{scriptId}")
     public void deleteScriptById(@PathVariable long scriptId, Principal principal){
