@@ -21,6 +21,7 @@ public class Game {
     }
 
     public GameReplay play() {
+        battleground.print();
         for (int i = 0; i < maxMoves; i++) {
             List<ActionSummary> tickActions = battleground.nextTick();
             replay.addTickActions(tickActions);

@@ -23,3 +23,7 @@ INSERT INTO scripts (user_id, name, raw, bytecode, is_bytecode_valid)
 VALUES
      ((SELECT id FROM users WHERE username = 'test_user'), 'Strawberry Sizzle', 'Test Script 2',
      '[33, 5, 0, 35, 0, 12, 35, 0]', true);
+
+INSERT INTO maps (name, swarms, file_path, img_file_path)
+VALUES
+    ('Fortress', 4, 'ns_fortress4.txt', 'fortress4.png')

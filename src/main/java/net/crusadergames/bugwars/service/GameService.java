@@ -2,35 +2,72 @@ package net.crusadergames.bugwars.service;
 
 import net.crusadergames.bugwars.dto.request.GameRequest;
 import net.crusadergames.bugwars.dto.response.GameReplay;
+import net.crusadergames.bugwars.dto.response.ResponseGameMap;
 import net.crusadergames.bugwars.game.Game;
 import net.crusadergames.bugwars.game.Swarm;
 import net.crusadergames.bugwars.game.setup.GameFactory;
 import net.crusadergames.bugwars.model.Script;
+import net.crusadergames.bugwars.repository.GameMapRepository;
 import net.crusadergames.bugwars.repository.ScriptRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 @Service
 public class GameService {
+    static final String BASE_IMG_PATH = "classpath:mapPictures/";
+
+    @Autowired
+    ResourceLoader loader;
+
+    @Autowired
+    GameMapRepository gameMapRepository;
+
     @Autowired
     GameFactory gameFactory;
 
     @Autowired
     ScriptRepository scriptRepository;
 
+
+    public List<ResponseGameMap> getAllMaps() {
+        return gameMapRepository.findAll()
+                .stream()
+                .map((map) -> new ResponseGameMap(
+                        map.getId(),
+                        map.getName(),
+                        encodeImg(map.getImgFilePath()),
+                        map.getSwarms()
+                ))
+                .toList();
+    }
+
     // TODO verify scripts are valid
     // TODO mapName is currently file name, fix it
+    // TODO make sure there aren't more swarms than map spawns
     public GameReplay playGame(GameRequest gameRequest) {
         List<Swarm> swarms = createSwarms(gameRequest.getScriptIds());
 
         Game game = gameFactory.createInstance(gameRequest.getMapName(), swarms);
         return game.play();
     }
+
+    private String encodeImg(String filePath) {
+        try {
+            byte[] imgByteArray = loader.getResource(BASE_IMG_PATH + filePath).getContentAsByteArray();
+            return Base64.getEncoder().encodeToString(imgByteArray);
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to load image.");
+        }
+    }
+
 
     private List<Swarm> createSwarms(List<Long> scriptIds) {
         List<Swarm> swarms = new ArrayList<>();
