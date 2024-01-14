@@ -3,6 +3,7 @@ package net.crusadergames.bugwars.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.crusadergames.bugwars.dto.request.GameRequest;
 import net.crusadergames.bugwars.dto.response.GameReplay;
+import net.crusadergames.bugwars.dto.response.ResponseGameMap;
 import net.crusadergames.bugwars.game.setup.GameFactory;
 import net.crusadergames.bugwars.service.GameService;
 import org.junit.jupiter.api.Test;
@@ -21,13 +22,13 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @WebMvcTest(controllers = GameController.class)
 @AutoConfigureMockMvc(addFilters = false)
 @ExtendWith(MockitoExtension.class)
 public class GameControllerTests {
-
     @Autowired
     ObjectMapper objectMapper;
     @Autowired
@@ -36,6 +37,16 @@ public class GameControllerTests {
     private GameService gameService;
     @MockBean
     private GameFactory gameFactory;
+
+    @Test
+    public void getAllMaps_returnsAllMaps() throws Exception {
+        List<ResponseGameMap> responseData = List.of(new ResponseGameMap(1L, "Test", "Testbase64", 4));
+        when(gameService.getAllMaps()).thenReturn(responseData);
+
+        ResultActions response = mockMvc.perform(get("/api/game/maps"));
+
+        response.andExpect(MockMvcResultMatchers.status().isOk());
+    }
 
     @Test
     public void playGame_returnsGameResponse() throws Exception {

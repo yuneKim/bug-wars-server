@@ -6,15 +6,20 @@ import net.crusadergames.bugwars.game.Game;
 import net.crusadergames.bugwars.game.Swarm;
 import net.crusadergames.bugwars.game.entity.Entity;
 import net.crusadergames.bugwars.game.setup.GameFactory;
+import net.crusadergames.bugwars.model.GameMap;
 import net.crusadergames.bugwars.model.Script;
+import net.crusadergames.bugwars.repository.GameMapRepository;
 import net.crusadergames.bugwars.repository.ScriptRepository;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -25,14 +30,47 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class GameServiceTests {
+    private static ResourceLoader testLoader;
+
+    @Mock
+    ResourceLoader loader;
+
     @Mock
     private GameFactory gameFactory;
+
+    @Mock
+    private GameMapRepository gameMapRepository;
 
     @Mock
     private ScriptRepository scriptRepository;
 
     @InjectMocks
     private GameService gameService;
+
+    @BeforeAll
+    public static void setup() {
+        testLoader = new DefaultResourceLoader();
+    }
+
+    @Test
+    public void getAllMaps_returnsAllMaps() {
+        List<GameMap> gameMaps = List.of(new GameMap(1L, "Test", "test", "fortress4.png", 4));
+        when(gameMapRepository.findAll()).thenReturn(gameMaps);
+        when(loader.getResource(Mockito.anyString())).thenAnswer((invocation) -> testLoader.getResource(invocation.getArgument(0)));
+
+        Assertions.assertThat(gameService.getAllMaps().size()).isEqualTo(1);
+    }
+
+    @Test
+    public void getAllMaps_throwsInternalServerErrorOnFailureToLoadImg() {
+        List<GameMap> gameMaps = List.of(new GameMap(1L, "Test", "test", "fortress.png", 4));
+        when(gameMapRepository.findAll()).thenReturn(gameMaps);
+        when(loader.getResource(Mockito.anyString())).thenAnswer((invocation) -> testLoader.getResource(invocation.getArgument(0)));
+
+        Assertions.assertThatThrownBy(() -> gameService.getAllMaps())
+                .isInstanceOf(ResponseStatusException.class)
+                .hasFieldOrPropertyWithValue("status", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
     @Test
     public void playGame_returnsGameReplay() {
