@@ -1,7 +1,7 @@
 package net.crusadergames.bugwars.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.crusadergames.bugwars.dto.request.CreateScriptRequest;
+import net.crusadergames.bugwars.dto.request.ModifyScriptRequest;
 import net.crusadergames.bugwars.model.Script;
 import net.crusadergames.bugwars.model.auth.User;
 import net.crusadergames.bugwars.service.ScriptService;
@@ -71,17 +71,31 @@ public class ScriptControllerTests {
 
     @Test
     public void createScript_returnsScript() throws Exception {
-        CreateScriptRequest createScriptRequest = new CreateScriptRequest("The Ol' Razzle Dazzle", ":START dance");
+        ModifyScriptRequest modifyScriptRequest = new ModifyScriptRequest("The Ol' Razzle Dazzle", ":START dance");
         when(scriptService.createScript(Mockito.any(), Mockito.any()))
                 .thenReturn(SCRIPT_1);
 
         ResultActions response = mockMvc.perform(post("/api/scripts")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createScriptRequest)));
+                .content(objectMapper.writeValueAsString(modifyScriptRequest)));
 
         response.andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(SCRIPT_1.getName())));
 
+    }
+
+    @Test
+    public void updateScript_returnsScript() throws Exception {
+        ModifyScriptRequest modifyScriptRequest = new ModifyScriptRequest("The Ol' Razzle Dazzle", ":START dance");
+        when(scriptService.updateScript(Mockito.anyLong(), Mockito.any(), Mockito.any()))
+                .thenReturn(SCRIPT_1);
+
+        ResultActions response = mockMvc.perform(put("/api/scripts/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(modifyScriptRequest)));
+
+        response.andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(SCRIPT_1.getName())));
     }
 
     @Test

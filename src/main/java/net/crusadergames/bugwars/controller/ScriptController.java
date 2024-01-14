@@ -1,6 +1,6 @@
 package net.crusadergames.bugwars.controller;
 
-import net.crusadergames.bugwars.dto.request.CreateScriptRequest;
+import net.crusadergames.bugwars.dto.request.ModifyScriptRequest;
 import net.crusadergames.bugwars.model.Script;
 import net.crusadergames.bugwars.service.ScriptService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +32,13 @@ public class ScriptController {
 
     @PostMapping
     @ResponseStatus(value = HttpStatus.CREATED)
-    public Script createScript(@RequestBody CreateScriptRequest request, Principal principal) {
+    public Script createScript(@RequestBody ModifyScriptRequest request, Principal principal) {
         return scriptService.createScript(request, principal);
+    }
+
+    @PutMapping(path="/{scriptId}")
+    public Script updateScript(@PathVariable Long scriptId, Principal principal, @RequestBody ModifyScriptRequest request){
+       return scriptService.updateScript(scriptId, principal, request);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)

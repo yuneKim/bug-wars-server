@@ -1,6 +1,6 @@
 package net.crusadergames.bugwars.service;
 
-import net.crusadergames.bugwars.dto.request.CreateScriptRequest;
+import net.crusadergames.bugwars.dto.request.ModifyScriptRequest;
 import net.crusadergames.bugwars.model.Script;
 import net.crusadergames.bugwars.model.auth.User;
 import net.crusadergames.bugwars.parser.BugAssemblyParseException;
@@ -108,7 +108,7 @@ public class ScriptServiceTests {
 
     @Test
     public void createScript_respondsWithConflictStatusOnDuplicateName() {
-        CreateScriptRequest request = new CreateScriptRequest("Highway Robbery", ":START\ngoto START");
+        ModifyScriptRequest request = new ModifyScriptRequest("Highway Robbery", ":START\ngoto START");
 
 
         Principal mockPrincipal = Mockito.mock(Principal.class);
@@ -125,7 +125,7 @@ public class ScriptServiceTests {
         List<Integer> expectedResult = List.of(35, 0);
         Principal mockPrincipal = Mockito.mock(Principal.class);
         BugAssemblyParser bugAssemblyParser = mock(BugAssemblyParser.class);
-        CreateScriptRequest request = new CreateScriptRequest("Highway Robbery", ":START\ngoto START");
+        ModifyScriptRequest request = new ModifyScriptRequest("Highway Robbery", ":START\ngoto START");
 
 
         when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.of(USER));
@@ -142,7 +142,7 @@ public class ScriptServiceTests {
     @Test
     public void createScript_handlesInvalidByteCode() throws BugAssemblyParseException {
         Principal mockPrincipal = Mockito.mock(Principal.class);
-        CreateScriptRequest request = new CreateScriptRequest("Highway Robbery", ":START\ngoto START");
+        ModifyScriptRequest request = new ModifyScriptRequest("Highway Robbery", ":START\ngoto START");
         BugAssemblyParser bugAssemblyParser = mock(BugAssemblyParser.class);
         List<Integer> emptyList = new ArrayList<>();
         Script testScript = new Script(1L, new User(), "Highway Snobbery", ":START wiggle", "", false);
@@ -157,6 +157,78 @@ public class ScriptServiceTests {
         Script createdScript = scriptService.createScript(request, mockPrincipal);
 
         Assertions.assertThat(createdScript.isBytecodeValid()).isFalse();
+    }
+
+    @Test
+    public void updateScript_returnsUpdatedScript() throws BugAssemblyParseException, JsonProcessingException {
+        List<Integer> expectedResult = List.of(35, 0);
+        Principal mockPrincipal = Mockito.mock(Principal.class);
+        BugAssemblyParser bugAssemblyParser = mock(BugAssemblyParser.class);
+        ModifyScriptRequest request = new ModifyScriptRequest("Highway Robbery", ":START\ngoto START");
+        USER.setId(1l);
+        when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.of(USER));
+        when(scriptRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(SCRIPT_1));
+        when(bugAssemblyParserFactory.createInstance()).thenReturn(bugAssemblyParser);
+        when(bugAssemblyParser.parse(request.getRaw())).thenReturn(expectedResult);
+        when(scriptRepository.save(Mockito.any(Script.class))).thenReturn(SCRIPT_1);
+
+        Script updatedScript = scriptService.updateScript(1L, mockPrincipal, request);
+
+        Assertions.assertThat(updatedScript).isNotNull();
+    }
+
+    @Test
+    public void updateScript_throwsNotFoundWhenScriptDoesNotExist() throws BugAssemblyParseException, JsonProcessingException {
+        List<Integer> expectedResult = List.of(35, 0);
+        Principal mockPrincipal = Mockito.mock(Principal.class);
+        BugAssemblyParser bugAssemblyParser = mock(BugAssemblyParser.class);
+        ModifyScriptRequest request = new ModifyScriptRequest("Highway Robbery", ":START\ngoto START");
+        USER.setId(1l);
+        when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.of(USER));
+        when(scriptRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> scriptService.updateScript(1L, mockPrincipal, request))
+                .isInstanceOf(ResponseStatusException.class)
+                .hasFieldOrPropertyWithValue("status", HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    public void updateScript_throwsForbiddenWhenUnauthorized() throws BugAssemblyParseException, JsonProcessingException {
+        List<Integer> expectedResult = List.of(35, 0);
+        Principal mockPrincipal = Mockito.mock(Principal.class);
+        BugAssemblyParser bugAssemblyParser = mock(BugAssemblyParser.class);
+        ModifyScriptRequest request = new ModifyScriptRequest("Highway Robbery", ":START\ngoto START");
+        User user = new User();
+        user.setId(1l);
+        USER.setId(2l);
+        when(mockPrincipal.getName()).thenReturn("Esteban");
+        when(userRepository.findByUsername("Esteban")).thenReturn(Optional.of(user));
+        when(scriptRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(SCRIPT_1));
+        when(bugAssemblyParserFactory.createInstance()).thenReturn(bugAssemblyParser);
+        Assertions.assertThatThrownBy(() -> scriptService.updateScript(1L, mockPrincipal, request))
+                .isInstanceOf(ResponseStatusException.class)
+                .hasFieldOrPropertyWithValue("status", HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void updateScript_handlesInvalidByteCode() throws BugAssemblyParseException, JsonProcessingException {
+        List<Integer> expectedResult = List.of(35, 0);
+        Principal mockPrincipal = Mockito.mock(Principal.class);
+        BugAssemblyParser bugAssemblyParser = mock(BugAssemblyParser.class);
+        Script testScript = new Script(1L, new User(), "Highway Snobbery", ":START wiggle", "", false);
+        ModifyScriptRequest request = new ModifyScriptRequest("Highway Robbery", ":START\ngoto START");
+        User user = new User();
+        user.setId(1l);
+        USER.setId(1l);
+        when(mockPrincipal.getName()).thenReturn("Esteban");
+        when(userRepository.findByUsername("Esteban")).thenReturn(Optional.of(user));
+        when(scriptRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(SCRIPT_1));
+        when(bugAssemblyParserFactory.createInstance()).thenReturn(bugAssemblyParser);
+        when(bugAssemblyParser.parse(request.getRaw())).thenThrow(BugAssemblyParseException.class);
+        when(scriptRepository.save(Mockito.any(Script.class))).thenReturn(testScript);
+        Script updatedScript = scriptService.updateScript(1L, mockPrincipal, request);
+
+        Assertions.assertThat(updatedScript.isBytecodeValid()).isFalse();
     }
 
     @Test

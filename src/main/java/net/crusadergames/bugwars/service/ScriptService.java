@@ -1,6 +1,6 @@
 package net.crusadergames.bugwars.service;
 
-import net.crusadergames.bugwars.dto.request.CreateScriptRequest;
+import net.crusadergames.bugwars.dto.request.ModifyScriptRequest;
 import net.crusadergames.bugwars.model.Script;
 import net.crusadergames.bugwars.model.auth.User;
 import net.crusadergames.bugwars.parser.BugAssemblyParseException;
@@ -51,7 +51,7 @@ public class ScriptService {
         return script;
     }
 
-    public Script createScript(CreateScriptRequest request, Principal principal) {
+    public Script createScript(ModifyScriptRequest request, Principal principal) {
         Script script = new Script();
         User user = getUser(principal);
         BugAssemblyParser parser = bugAssemblyParserFactory.createInstance();
@@ -77,15 +77,40 @@ public class ScriptService {
         return scriptRepository.save(script);
     }
 
-    public void deleteScriptById(long scriptId, Principal principal){
+    public Script updateScript(long scriptId, Principal principal, ModifyScriptRequest request) {
+        User user = getUser(principal);
+        Optional<Script> existingScript = scriptRepository.findById(scriptId);
+        BugAssemblyParser parser = bugAssemblyParserFactory.createInstance();
+        if (existingScript.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Script does not exist.");
+        }
+        if (!existingScript.get().getUser().getId().equals(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This user does not have access to this script.");
+        }
+        Script scriptToSave = existingScript.get();
+        List<Integer> byteCode;
+        try {
+            byteCode = parser.parse(request.getRaw());
+            scriptToSave.setBytecodeValid(true);
+        } catch (BugAssemblyParseException e) {
+            byteCode = new ArrayList<>();
+            scriptToSave.setBytecodeValid(false);
+        }
+        scriptToSave.setName(request.getName());
+        scriptToSave.setRaw(request.getRaw());
+        scriptToSave.setBytecode(String.format("[%s]", byteCode.stream().map(Object::toString).collect(Collectors.joining(", "))));
+        return scriptRepository.save(scriptToSave);
+    }
+
+    public void deleteScriptById(long scriptId, Principal principal) {
         User user = getUser(principal);
         Optional<Script> existingScript = scriptRepository.findById(scriptId);
 
-        if(existingScript.isEmpty()){
+        if (existingScript.isEmpty()) {
             return;
         }
 
-        if(!existingScript.get().getUser().getId().equals(user.getId())){
+        if (!existingScript.get().getUser().getId().equals(user.getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This action cannot be done.");
         }
         scriptRepository.deleteById(scriptId);
@@ -96,8 +121,6 @@ public class ScriptService {
                 new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
                         "User does not exist."));
     }
-
-
 
 
 }
