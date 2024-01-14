@@ -1,0 +1,8 @@
+7,7,Arena Mini2
+XXXXXXX
+X 000 X
+X     X
+X  a  X
+X     X
+X 111 X
+XXXXXXX

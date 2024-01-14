@@ -1,5 +1,6 @@
 package net.crusadergames.bugwars.parser;
 
+import net.crusadergames.bugwars.config.BugAssemblyCommands;
 import org.springframework.stereotype.Component;
 
 @Component

@@ -1,4 +1,4 @@
-package net.crusadergames.bugwars.parser;
+package net.crusadergames.bugwars.config;
 
 import java.util.HashMap;
 import java.util.Map;
