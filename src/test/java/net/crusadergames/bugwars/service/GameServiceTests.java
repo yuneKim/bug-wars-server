@@ -56,20 +56,8 @@ public class GameServiceTests {
     public void getAllMaps_returnsAllMaps() {
         List<GameMap> gameMaps = List.of(new GameMap(1L, "Test", "test", "fortress4.png", 4));
         when(gameMapRepository.findAll()).thenReturn(gameMaps);
-        when(loader.getResource(Mockito.anyString())).thenAnswer((invocation) -> testLoader.getResource(invocation.getArgument(0)));
 
         Assertions.assertThat(gameService.getAllMaps().size()).isEqualTo(1);
-    }
-
-    @Test
-    public void getAllMaps_throwsInternalServerErrorOnFailureToLoadImg() {
-        List<GameMap> gameMaps = List.of(new GameMap(1L, "Test", "test", "fortress.png", 4));
-        when(gameMapRepository.findAll()).thenReturn(gameMaps);
-        when(loader.getResource(Mockito.anyString())).thenAnswer((invocation) -> testLoader.getResource(invocation.getArgument(0)));
-
-        Assertions.assertThatThrownBy(() -> gameService.getAllMaps())
-                .isInstanceOf(ResponseStatusException.class)
-                .hasFieldOrPropertyWithValue("status", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Test

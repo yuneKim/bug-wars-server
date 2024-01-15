@@ -10,23 +10,15 @@ import net.crusadergames.bugwars.model.Script;
 import net.crusadergames.bugwars.repository.GameMapRepository;
 import net.crusadergames.bugwars.repository.ScriptRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 
 @Service
 public class GameService {
-    static final String BASE_IMG_PATH = "classpath:mapPictures/";
-
-    @Autowired
-    ResourceLoader loader;
-
     @Autowired
     GameMapRepository gameMapRepository;
 
@@ -43,7 +35,7 @@ public class GameService {
                 .map((map) -> new ResponseGameMap(
                         map.getId(),
                         map.getName(),
-                        encodeImg(map.getImgFilePath()),
+                        map.getPreviewImgUrl(),
                         map.getSwarms()
                 ))
                 .toList();
@@ -58,16 +50,6 @@ public class GameService {
         Game game = gameFactory.createInstance(gameRequest.getMapName(), swarms);
         return game.play();
     }
-
-    private String encodeImg(String filePath) {
-        try {
-            byte[] imgByteArray = loader.getResource(BASE_IMG_PATH + filePath).getContentAsByteArray();
-            return Base64.getEncoder().encodeToString(imgByteArray);
-        } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to load image.");
-        }
-    }
-
 
     private List<Swarm> createSwarms(List<Long> scriptIds) {
         List<Swarm> swarms = new ArrayList<>();
