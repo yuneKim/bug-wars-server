@@ -36,7 +36,6 @@ public class BugAssemblyParserServiceTests {
         when(bugAssemblyParser.parse(bugAssemblyParseRequest.getCode())).thenReturn(expectedResult);
 
         List<Integer> byteCode = bugAssemblyParserService.parse(bugAssemblyParseRequest);
-        System.out.println(byteCode);
 
         Assertions.assertThat(byteCode).hasSize(2).hasSameElementsAs(expectedResult);
     }

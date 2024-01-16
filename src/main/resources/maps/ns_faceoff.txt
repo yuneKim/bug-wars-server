@@ -18,7 +18,7 @@ XX          a a a          XX
 XX XX XXXXX X X X XXXX XXXXXX
 XX                         XX
 X                           X
-XX        XXXX       0     XX
+XX       XXXX        0     XX
 X                    XXXXX  X
 XX    0       0      X00 X XX
 X                    X 0    X 

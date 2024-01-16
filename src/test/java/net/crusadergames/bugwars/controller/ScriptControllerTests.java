@@ -2,6 +2,7 @@ package net.crusadergames.bugwars.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.crusadergames.bugwars.dto.request.ModifyScriptRequest;
+import net.crusadergames.bugwars.dto.response.ScriptName;
 import net.crusadergames.bugwars.model.Script;
 import net.crusadergames.bugwars.model.auth.User;
 import net.crusadergames.bugwars.service.ScriptService;
@@ -44,7 +45,21 @@ public class ScriptControllerTests {
     private ObjectMapper objectMapper;
 
     @Test
-    public void list_returnsAllScripts() throws Exception {
+    public void getAllNamesOfValidScripts_returnsValidScriptNames() throws Exception {
+        when(scriptService.getAllNamesOfValidScripts()).thenReturn(
+                List.of(new ScriptName(1L, "Test1"), new ScriptName(2L, "Test2"))
+        );
+
+        ResultActions response = mockMvc.perform(get("/api/scripts/all"));
+
+
+        response.andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers
+                        .jsonPath("$.size()", CoreMatchers.is(2)));
+    }
+
+    @Test
+    public void getUserScripts_returnsAllScripts() throws Exception {
         List<Script> scripts = List.of(SCRIPT_1, SCRIPT_2, SCRIPT_3);
         when(scriptService.getUserScripts(Mockito.any()))
                 .thenReturn(scripts);

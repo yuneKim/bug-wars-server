@@ -1,6 +1,7 @@
 package net.crusadergames.bugwars.service;
 
 import net.crusadergames.bugwars.dto.request.ModifyScriptRequest;
+import net.crusadergames.bugwars.dto.response.ScriptName;
 import net.crusadergames.bugwars.model.Script;
 import net.crusadergames.bugwars.model.auth.User;
 import net.crusadergames.bugwars.parser.BugAssemblyParseException;
@@ -30,6 +31,13 @@ public class ScriptService {
 
     @Autowired
     BugAssemblyParserFactory bugAssemblyParserFactory;
+
+    public List<ScriptName> getAllNamesOfValidScripts() {
+        return scriptRepository.findByIsBytecodeValidTrue()
+                .stream()
+                .map((script) -> new ScriptName(script.getId(), script.getName()))
+                .toList();
+    }
 
     public List<Script> getUserScripts(Principal principal) {
         User user = getUser(principal);
@@ -121,6 +129,5 @@ public class ScriptService {
                 new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
                         "User does not exist."));
     }
-
 
 }

@@ -32,9 +32,9 @@ public class BattlegroundTests {
                 new Swarm("Swarm 4", new int[]{13})
         );
         Battleground battleground = new BattlegroundFactory(mapFile, swarms).createBattleground();
-        List<ActionSummary> tickSummary = battleground.nextTick();
+        TickSummary tickSummary = battleground.nextTick();
         Assertions.assertThat(tickSummary).isNotNull();
-        Assertions.assertThat(tickSummary.size()).isGreaterThan(0);
+        Assertions.assertThat(tickSummary.getSummary().size()).isGreaterThan(0);
     }
 
     @Test
@@ -77,10 +77,8 @@ public class BattlegroundTests {
                 new Swarm("Swarm 2", new int[]{13, 14})
         );
         Battleground battleground = new BattlegroundFactory(mapFile, swarms).createBattleground();
-        battleground.print();
         for (int i = 0; i < 3; i++) {
             battleground.nextTick();
-            battleground.print();
         }
         Entity expectFood = battleground.getGrid()[4][2];
         Assertions.assertThat(expectFood).isInstanceOf(Food.class);

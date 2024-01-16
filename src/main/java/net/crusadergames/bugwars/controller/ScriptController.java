@@ -1,6 +1,7 @@
 package net.crusadergames.bugwars.controller;
 
 import net.crusadergames.bugwars.dto.request.ModifyScriptRequest;
+import net.crusadergames.bugwars.dto.response.ScriptName;
 import net.crusadergames.bugwars.model.Script;
 import net.crusadergames.bugwars.service.ScriptService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +21,18 @@ public class ScriptController {
     @Autowired
     ScriptService scriptService;
 
+    @GetMapping("/all")
+    @PreAuthorize("permitAll()")
+    public List<ScriptName> getAllNamesOfValidScripts() {
+        return scriptService.getAllNamesOfValidScripts();
+    }
+
     @GetMapping
-    public List<Script> list(Principal principal) {
+    public List<Script> getUserScripts(Principal principal) {
         return scriptService.getUserScripts(principal);
     }
 
-    @GetMapping(path="/{id}")
+    @GetMapping(path = "/{id}")
     public Script getScript(@PathVariable long id, Principal principal) {
         return scriptService.getScript(id, principal);
     }
@@ -36,14 +43,14 @@ public class ScriptController {
         return scriptService.createScript(request, principal);
     }
 
-    @PutMapping(path="/{scriptId}")
-    public Script updateScript(@PathVariable Long scriptId, Principal principal, @RequestBody ModifyScriptRequest request){
-       return scriptService.updateScript(scriptId, principal, request);
+    @PutMapping(path = "/{scriptId}")
+    public Script updateScript(@PathVariable Long scriptId, Principal principal, @RequestBody ModifyScriptRequest request) {
+        return scriptService.updateScript(scriptId, principal, request);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping(path="/{scriptId}")
-    public void deleteScriptById(@PathVariable long scriptId, Principal principal){
+    @DeleteMapping(path = "/{scriptId}")
+    public void deleteScriptById(@PathVariable long scriptId, Principal principal) {
         scriptService.deleteScriptById(scriptId, principal);
     }
 

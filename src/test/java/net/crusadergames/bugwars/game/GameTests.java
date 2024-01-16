@@ -19,6 +19,7 @@ public class GameTests {
         List<Swarm> swarms = List.of(new Swarm("Swarm1", new int[]{10}), new Swarm("Swarm2", new int[]{10}));
 
         when(battleground.getGrid()).thenReturn(new Entity[][]{});
+        when(battleground.nextTick()).thenReturn(new TickSummary());
         Game game = new Game(battleground, swarms, 25);
         game.play();
 
@@ -31,8 +32,23 @@ public class GameTests {
         List<Swarm> swarms = List.of(new Swarm("Swarm1", new int[]{10}), new Swarm("Swarm2", new int[]{10}));
 
         when(battleground.getGrid()).thenReturn(new Entity[][]{});
+        when(battleground.nextTick()).thenReturn(new TickSummary());
         Game game = new Game(battleground, swarms, 100);
         GameReplay gameReplay = game.play();
         Assertions.assertThat(gameReplay).isNotNull();
+        Mockito.verify(battleground, times(100)).nextTick();
+    }
+
+    @Test
+    public void endsEarlyIfOneSwarmLeft() {
+        Battleground battleground = Mockito.mock(Battleground.class);
+        List<Swarm> swarms = List.of(new Swarm("Swarm1", new int[]{10}), new Swarm("Swarm2", new int[]{10}));
+
+        when(battleground.getGrid()).thenReturn(new Entity[][]{});
+        when(battleground.nextTick()).thenReturn(new TickSummary(List.of(), true));
+        Game game = new Game(battleground, swarms, 100);
+        GameReplay gameReplay = game.play();
+        Assertions.assertThat(gameReplay).isNotNull();
+        Mockito.verify(battleground, times(1)).nextTick();
     }
 }

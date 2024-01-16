@@ -2,10 +2,13 @@ package net.crusadergames.bugwars.service;
 
 import net.crusadergames.bugwars.dto.request.GameRequest;
 import net.crusadergames.bugwars.dto.response.GameReplay;
+import net.crusadergames.bugwars.dto.response.ResponseGameMap;
 import net.crusadergames.bugwars.game.Game;
 import net.crusadergames.bugwars.game.Swarm;
 import net.crusadergames.bugwars.game.setup.GameFactory;
+import net.crusadergames.bugwars.model.GameMap;
 import net.crusadergames.bugwars.model.Script;
+import net.crusadergames.bugwars.repository.GameMapRepository;
 import net.crusadergames.bugwars.repository.ScriptRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,17 +21,34 @@ import java.util.List;
 @Service
 public class GameService {
     @Autowired
+    GameMapRepository gameMapRepository;
+
+    @Autowired
     GameFactory gameFactory;
 
     @Autowired
     ScriptRepository scriptRepository;
 
-    // TODO verify scripts are valid
-    // TODO mapName is currently file name, fix it
-    public GameReplay playGame(GameRequest gameRequest) {
-        List<Swarm> swarms = createSwarms(gameRequest.getScriptIds());
 
-        Game game = gameFactory.createInstance(gameRequest.getMapName(), swarms);
+    public List<ResponseGameMap> getAllMaps() {
+        return gameMapRepository.findAll()
+                .stream()
+                .map((map) -> new ResponseGameMap(
+                        map.getId(),
+                        map.getName(),
+                        map.getPreviewImgUrl(),
+                        map.getSwarms()
+                ))
+                .toList();
+    }
+
+    // TODO verify scripts are valid
+    public GameReplay playGame(GameRequest gameRequest) {
+        GameMap map = gameMapRepository.findById(gameRequest.getMapId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Map not found."));
+        List<Swarm> swarms = createSwarms(gameRequest.getScriptIds().stream().limit(map.getSwarms()).toList());
+
+        Game game = gameFactory.createInstance(map.getFileName(), swarms);
         return game.play();
     }
 
