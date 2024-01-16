@@ -1,6 +1,7 @@
 package net.crusadergames.bugwars.service;
 
 import net.crusadergames.bugwars.dto.request.ModifyScriptRequest;
+import net.crusadergames.bugwars.dto.response.ScriptName;
 import net.crusadergames.bugwars.model.Script;
 import net.crusadergames.bugwars.model.auth.User;
 import net.crusadergames.bugwars.parser.BugAssemblyParseException;
@@ -25,7 +26,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 public class ScriptServiceTests {
@@ -45,6 +45,18 @@ public class ScriptServiceTests {
     private BugAssemblyParserFactory bugAssemblyParserFactory;
     @InjectMocks
     private ScriptService scriptService;
+
+    @Test
+    public void getAllNamesOfValidScripts_returnsAllValidScripts() {
+        when(scriptRepository.findByIsBytecodeValidTrue()).thenReturn(List.of(
+                SCRIPT_1,
+                SCRIPT_2
+        ));
+
+        List<ScriptName> scripts = scriptService.getAllNamesOfValidScripts();
+
+        Assertions.assertThat(scripts).hasSize(2);
+    }
 
     @Test
     public void getUserScripts_returnsAllUsersScripts() {
@@ -232,7 +244,7 @@ public class ScriptServiceTests {
     }
 
     @Test
-    public void deleteScriptById_returnsForbiddenStatusWhenUserIdsDontMatch(){
+    public void deleteScriptById_returnsForbiddenStatusWhenUserIdsDontMatch() {
         Principal mockPrincipal = Mockito.mock(Principal.class);
         when(mockPrincipal.getName()).thenReturn("Esteban");
 
@@ -250,7 +262,7 @@ public class ScriptServiceTests {
     }
 
     @Test
-    public void deleteScriptById_doesNotDeleteIfScriptDoesNotExist(){
+    public void deleteScriptById_doesNotDeleteIfScriptDoesNotExist() {
         Principal mockPrincipal = Mockito.mock(Principal.class);
         when(mockPrincipal.getName()).thenReturn("Esteban");
 
@@ -266,7 +278,7 @@ public class ScriptServiceTests {
     }
 
     @Test
-    public void deleteScriptById_deletesCorrectScript(){
+    public void deleteScriptById_deletesCorrectScript() {
         Principal mockPrincipal = Mockito.mock(Principal.class);
         when(mockPrincipal.getName()).thenReturn("Esteban");
 
