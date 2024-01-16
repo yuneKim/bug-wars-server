@@ -43,14 +43,12 @@ public class GameService {
     }
 
     // TODO verify scripts are valid
-    // TODO mapName is currently file name, fix it
-    // TODO make sure there aren't more swarms than map spawns
     public GameReplay playGame(GameRequest gameRequest) {
-        List<Swarm> swarms = createSwarms(gameRequest.getScriptIds());
         GameMap map = gameMapRepository.findById(gameRequest.getMapId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Map not found."));
+        List<Swarm> swarms = createSwarms(gameRequest.getScriptIds().stream().limit(map.getSwarms()).toList());
 
-        Game game = gameFactory.createInstance(map.getFileName(), swarms.stream().limit(map.getSwarms()).toList());
+        Game game = gameFactory.createInstance(map.getFileName(), swarms);
         return game.play();
     }
 

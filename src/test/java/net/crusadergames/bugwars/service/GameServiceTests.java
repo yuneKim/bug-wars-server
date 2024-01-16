@@ -78,6 +78,7 @@ public class GameServiceTests {
         when(scriptRepository.findById(2L)).thenReturn(Optional.of(script2));
         when(gameMapRepository.findById(1L)).thenReturn(Optional.of(map));
         when(map.getFileName()).thenReturn(mapName);
+        when(map.getSwarms()).thenReturn(2);
         when(gameFactory.createInstance(mapName, swarms)).thenReturn(game);
         when(game.play()).thenReturn(new GameReplay(null, new Entity[][]{}, null));
 
@@ -89,11 +90,14 @@ public class GameServiceTests {
     @Test
     public void playGame_throwsHttpStatusExceptionOnInvalidScript() {
         GameRequest gameRequest = new GameRequest(List.of(1L, 2L), 1L);
+        GameMap map = Mockito.mock(GameMap.class);
 
         Script script1 = new Script(1L, "Test1", "[13]");
 
         when(scriptRepository.findById(1L)).thenReturn(Optional.of(script1));
         when(scriptRepository.findById(2L)).thenReturn(Optional.empty());
+        when(gameMapRepository.findById(1L)).thenReturn(Optional.of(map));
+        when(map.getSwarms()).thenReturn(2);
 
         Assertions.assertThatThrownBy(() -> gameService.playGame(gameRequest))
                 .isInstanceOf(ResponseStatusException.class)
