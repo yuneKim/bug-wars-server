@@ -63,7 +63,8 @@ public class GameServiceTests {
     @Test
     public void playGame_returnsGameReplay() {
         String mapName = "Arena";
-        GameRequest gameRequest = new GameRequest(List.of(1L, 2L), mapName);
+        GameRequest gameRequest = new GameRequest(List.of(1L, 2L), 1L);
+        GameMap map = Mockito.mock(GameMap.class);
 
         Script script1 = new Script(1L, "Test1", "[13]");
         Script script2 = new Script(2L, "Test2", "[10, 11]");
@@ -75,6 +76,8 @@ public class GameServiceTests {
 
         when(scriptRepository.findById(1L)).thenReturn(Optional.of(script1));
         when(scriptRepository.findById(2L)).thenReturn(Optional.of(script2));
+        when(gameMapRepository.findById(1L)).thenReturn(Optional.of(map));
+        when(map.getFileName()).thenReturn(mapName);
         when(gameFactory.createInstance(mapName, swarms)).thenReturn(game);
         when(game.play()).thenReturn(new GameReplay(null, new Entity[][]{}, null));
 
@@ -85,8 +88,7 @@ public class GameServiceTests {
 
     @Test
     public void playGame_throwsHttpStatusExceptionOnInvalidScript() {
-        String mapName = "Arena";
-        GameRequest gameRequest = new GameRequest(List.of(1L, 2L), mapName);
+        GameRequest gameRequest = new GameRequest(List.of(1L, 2L), 1L);
 
         Script script1 = new Script(1L, "Test1", "[13]");
 

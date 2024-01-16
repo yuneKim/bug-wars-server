@@ -50,7 +50,7 @@ public class GameControllerTests {
 
     @Test
     public void playGame_returnsGameResponse() throws Exception {
-        GameRequest createGameRequest = new GameRequest(List.of(1L, 2L), "Columbus");
+        GameRequest createGameRequest = new GameRequest(List.of(1L, 2L), 1L);
         GameReplay gameReplay = Mockito.mock(GameReplay.class);
         when(gameService.playGame(Mockito.any())).thenReturn(gameReplay);
 

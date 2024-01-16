@@ -6,6 +6,7 @@ import net.crusadergames.bugwars.dto.response.ResponseGameMap;
 import net.crusadergames.bugwars.game.Game;
 import net.crusadergames.bugwars.game.Swarm;
 import net.crusadergames.bugwars.game.setup.GameFactory;
+import net.crusadergames.bugwars.model.GameMap;
 import net.crusadergames.bugwars.model.Script;
 import net.crusadergames.bugwars.repository.GameMapRepository;
 import net.crusadergames.bugwars.repository.ScriptRepository;
@@ -46,8 +47,10 @@ public class GameService {
     // TODO make sure there aren't more swarms than map spawns
     public GameReplay playGame(GameRequest gameRequest) {
         List<Swarm> swarms = createSwarms(gameRequest.getScriptIds());
+        GameMap map = gameMapRepository.findById(gameRequest.getMapId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Map not found."));
 
-        Game game = gameFactory.createInstance(gameRequest.getMapName(), swarms);
+        Game game = gameFactory.createInstance(map.getFileName(), swarms.stream().limit(map.getSwarms()).toList());
         return game.play();
     }
 

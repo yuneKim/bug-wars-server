@@ -20,7 +20,7 @@ public class GameMap {
     private String name;
 
     @NotBlank
-    private String filePath;
+    private String fileName;
 
     @NotBlank
     private String previewImgUrl;
