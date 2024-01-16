@@ -32,9 +32,9 @@ public class BattlegroundTests {
                 new Swarm("Swarm 4", new int[]{13})
         );
         Battleground battleground = new BattlegroundFactory(mapFile, swarms).createBattleground();
-        List<ActionSummary> tickSummary = battleground.nextTick();
+        TickSummary tickSummary = battleground.nextTick();
         Assertions.assertThat(tickSummary).isNotNull();
-        Assertions.assertThat(tickSummary.size()).isGreaterThan(0);
+        Assertions.assertThat(tickSummary.getSummary().size()).isGreaterThan(0);
     }
 
     @Test

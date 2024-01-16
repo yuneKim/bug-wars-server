@@ -26,7 +26,7 @@ public class Battleground {
         init();
     }
 
-    public List<ActionSummary> nextTick() {
+    public TickSummary nextTick() {
         List<ActionSummary> actionsTaken = new ArrayList<>();
         for (index = 0; index < bugs.size(); index++) {
             Bug bug = bugs.get(index);
@@ -37,7 +37,7 @@ public class Battleground {
             actionsTaken.add(new ActionSummary(bug.getCoords(), action));
             actions.get(action).run(bug);
         }
-        return actionsTaken;
+        return new TickSummary(actionsTaken, lastSwarmStanding());
     }
 
     @ExcludeFromJacocoGeneratedReport
@@ -120,8 +120,13 @@ public class Battleground {
         return grid[coords.y][coords.x];
     }
 
+    private boolean lastSwarmStanding() {
+        return bugs.stream().map(Bug::getSwarm).distinct().limit(2).count() <= 1;
+    }
+
     @FunctionalInterface
     interface Action {
+
         void run(Bug bug);
     }
 }

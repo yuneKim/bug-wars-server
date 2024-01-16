@@ -22,11 +22,11 @@ public class Game {
 
     public GameReplay play() {
         for (int i = 0; i < maxMoves; i++) {
-            List<ActionSummary> tickActions = battleground.nextTick();
-            replay.addTickActions(tickActions);
+            TickSummary tickSummary = battleground.nextTick();
+            replay.addTickActions(tickSummary.summary);
+
+            if (tickSummary.lastSwarmStanding) break;
         }
         return replay;
     }
-
-
 }
