@@ -1,0 +1,32 @@
+31,31,Pickaxe
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+X                             X
+X a           a a           a X
+X                             X
+X     XXX             XXX     X
+X    X                   X    X
+X   X X                 X X   X
+X   X  X               X  X   X
+X   X   X  0   0   0  X   X   X
+X        X           X        X
+X         X  0 0 0  X         X
+X       1  X       X  3       X
+X           X     X           X
+X         1  X   X  3         X
+X a           X X           a X
+X       1 1    X    3 3       X
+X a           X X           a X
+X         1  X   X  3         X
+X           X     X           X
+X       1  X       X  3       X
+X         X  2 2 2  X         X
+X        X           X        X
+X   X   X  2   2   2  X   X   X
+X   X  X               X  X   X
+X   X X                 X X   X
+X    X                   X    X
+X     XXX             XXX     X
+X                             X
+X a           a a           a X
+X                             X
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX

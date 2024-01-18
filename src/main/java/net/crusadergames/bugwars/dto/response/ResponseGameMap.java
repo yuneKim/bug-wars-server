@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ResponseGameMap {
-    private Long id;
+    private Integer id;
     private String name;
     private String previewImgUrl;
     private Integer swarms;

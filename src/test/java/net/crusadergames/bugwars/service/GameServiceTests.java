@@ -1,25 +1,22 @@
 package net.crusadergames.bugwars.service;
 
+import net.crusadergames.bugwars.config.Maps;
 import net.crusadergames.bugwars.dto.request.GameRequest;
 import net.crusadergames.bugwars.dto.response.GameReplay;
+import net.crusadergames.bugwars.dto.response.ResponseGameMap;
 import net.crusadergames.bugwars.game.Game;
 import net.crusadergames.bugwars.game.Swarm;
 import net.crusadergames.bugwars.game.entity.Entity;
 import net.crusadergames.bugwars.game.setup.GameFactory;
-import net.crusadergames.bugwars.model.GameMap;
 import net.crusadergames.bugwars.model.Script;
-import net.crusadergames.bugwars.repository.GameMapRepository;
 import net.crusadergames.bugwars.repository.ScriptRepository;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -30,16 +27,8 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class GameServiceTests {
-    private static ResourceLoader testLoader;
-
-    @Mock
-    ResourceLoader loader;
-
     @Mock
     private GameFactory gameFactory;
-
-    @Mock
-    private GameMapRepository gameMapRepository;
 
     @Mock
     private ScriptRepository scriptRepository;
@@ -47,24 +36,17 @@ public class GameServiceTests {
     @InjectMocks
     private GameService gameService;
 
-    @BeforeAll
-    public static void setup() {
-        testLoader = new DefaultResourceLoader();
-    }
-
     @Test
     public void getAllMaps_returnsAllMaps() {
-        List<GameMap> gameMaps = List.of(new GameMap(1L, "Test", "test", "fortress4.png", 4));
-        when(gameMapRepository.findAll()).thenReturn(gameMaps);
+        List<ResponseGameMap> gameMaps = gameService.getAllMaps();
 
-        Assertions.assertThat(gameService.getAllMaps().size()).isEqualTo(1);
+        Assertions.assertThat(gameMaps.size()).isGreaterThan(0);
     }
 
     @Test
     public void playGame_returnsGameReplay() {
-        String mapName = "Arena";
-        GameRequest gameRequest = new GameRequest(List.of(1L, 2L), 1L);
-        GameMap map = Mockito.mock(GameMap.class);
+        String mapName = "ns_faceoff.txt";
+        GameRequest gameRequest = new GameRequest(List.of(1L, 2L), 1);
 
         Script script1 = new Script(1L, "Test1", "[13]");
         Script script2 = new Script(2L, "Test2", "[10, 11]");
@@ -76,9 +58,6 @@ public class GameServiceTests {
 
         when(scriptRepository.findById(1L)).thenReturn(Optional.of(script1));
         when(scriptRepository.findById(2L)).thenReturn(Optional.of(script2));
-        when(gameMapRepository.findById(1L)).thenReturn(Optional.of(map));
-        when(map.getFileName()).thenReturn(mapName);
-        when(map.getSwarms()).thenReturn(2);
         when(gameFactory.createInstance(mapName, swarms)).thenReturn(game);
         when(game.play()).thenReturn(new GameReplay(null, new Entity[][]{}, null));
 
@@ -88,16 +67,28 @@ public class GameServiceTests {
     }
 
     @Test
+    public void playGame_throwsHttpStatusExceptionOnInvalidMap() {
+        GameRequest gameRequest = new GameRequest(List.of(1L, 2L), -1);
+
+        Assertions.assertThatThrownBy(() -> gameService.playGame(gameRequest))
+                .isInstanceOf(ResponseStatusException.class)
+                .hasFieldOrPropertyWithValue("status", HttpStatus.NOT_FOUND);
+
+        GameRequest gameRequest2 = new GameRequest(List.of(1L, 2L), Maps.getMaps().size() + 1);
+
+        Assertions.assertThatThrownBy(() -> gameService.playGame(gameRequest2))
+                .isInstanceOf(ResponseStatusException.class)
+                .hasFieldOrPropertyWithValue("status", HttpStatus.NOT_FOUND);
+    }
+
+    @Test
     public void playGame_throwsHttpStatusExceptionOnInvalidScript() {
-        GameRequest gameRequest = new GameRequest(List.of(1L, 2L), 1L);
-        GameMap map = Mockito.mock(GameMap.class);
+        GameRequest gameRequest = new GameRequest(List.of(1L, 2L), 1);
 
         Script script1 = new Script(1L, "Test1", "[13]");
 
         when(scriptRepository.findById(1L)).thenReturn(Optional.of(script1));
         when(scriptRepository.findById(2L)).thenReturn(Optional.empty());
-        when(gameMapRepository.findById(1L)).thenReturn(Optional.of(map));
-        when(map.getSwarms()).thenReturn(2);
 
         Assertions.assertThatThrownBy(() -> gameService.playGame(gameRequest))
                 .isInstanceOf(ResponseStatusException.class)

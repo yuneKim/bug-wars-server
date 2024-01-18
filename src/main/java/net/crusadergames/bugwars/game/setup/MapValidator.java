@@ -70,7 +70,7 @@ public class MapValidator {
             for (int x = 0; x < line.length(); x++) {
                 char c = line.charAt(x);
                 if (!List.of('X', 'a', '0', '1', '2', '3', ' ').contains(c)) {
-                    System.err.println("Title Line Bad");
+                    System.err.println("Invalid character");
                     return false;
                 }
 

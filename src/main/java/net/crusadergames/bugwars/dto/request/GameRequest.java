@@ -16,5 +16,5 @@ public class GameRequest {
     private List<Long> scriptIds;
 
     @NotBlank
-    private Long mapId;
+    private Integer mapId;
 }

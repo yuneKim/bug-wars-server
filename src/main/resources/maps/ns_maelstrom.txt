@@ -1,0 +1,32 @@
+31,31,Maelstrom
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+X       X              X    XXX
+X       X    a        X      XX
+X        X           X    X   X
+X  a a   X      X    X 0 0 X  X
+X         X      X 0 X     X  X
+X  a a    X      X   X 0 0 X  X
+X                X    X   X   X
+X                X     XXX    X
+X          X      X 0         X
+X          X      X     0    XX
+X   XXX     X      X        X X
+X XX     X   X      XX     X  X
+XX        XXX         XXXXX   X
+X            Xaaa           a X
+X             a a             X
+X a           aaaX            X
+X   XXXXX         XXX        XX
+X  X     XX      X   X     XX X
+X X        X      X     XXX   X
+XX    1     X      X          X
+X         1 X      X          X
+X    XXX     X                X
+X   X   X    X                X
+X  X 1 1 X   X      X    a a  X
+X  X     X 1 X      X         X
+X  X 1 1 X    X      X   a a  X
+X   X    X           X        X
+XX      X        a    X       X
+XXX    X              X       X
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX

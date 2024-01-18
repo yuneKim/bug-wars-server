@@ -40,7 +40,7 @@ public class GameControllerTests {
 
     @Test
     public void getAllMaps_returnsAllMaps() throws Exception {
-        List<ResponseGameMap> responseData = List.of(new ResponseGameMap(1L, "Test", "Testbase64", 4));
+        List<ResponseGameMap> responseData = List.of(new ResponseGameMap(1, "Test", "Testbase64", 4));
         when(gameService.getAllMaps()).thenReturn(responseData);
 
         ResultActions response = mockMvc.perform(get("/api/game/maps"));
@@ -50,7 +50,7 @@ public class GameControllerTests {
 
     @Test
     public void playGame_returnsGameResponse() throws Exception {
-        GameRequest createGameRequest = new GameRequest(List.of(1L, 2L), 1L);
+        GameRequest createGameRequest = new GameRequest(List.of(1L, 2L), 1);
         GameReplay gameReplay = Mockito.mock(GameReplay.class);
         when(gameService.playGame(Mockito.any())).thenReturn(gameReplay);
 
