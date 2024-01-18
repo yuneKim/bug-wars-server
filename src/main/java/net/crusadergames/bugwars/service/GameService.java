@@ -1,5 +1,6 @@
 package net.crusadergames.bugwars.service;
 
+import net.crusadergames.bugwars.config.Maps;
 import net.crusadergames.bugwars.dto.request.GameRequest;
 import net.crusadergames.bugwars.dto.response.GameReplay;
 import net.crusadergames.bugwars.dto.response.ResponseGameMap;
@@ -8,7 +9,6 @@ import net.crusadergames.bugwars.game.Swarm;
 import net.crusadergames.bugwars.game.setup.GameFactory;
 import net.crusadergames.bugwars.model.GameMap;
 import net.crusadergames.bugwars.model.Script;
-import net.crusadergames.bugwars.repository.GameMapRepository;
 import net.crusadergames.bugwars.repository.ScriptRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,9 +21,6 @@ import java.util.List;
 @Service
 public class GameService {
     @Autowired
-    GameMapRepository gameMapRepository;
-
-    @Autowired
     GameFactory gameFactory;
 
     @Autowired
@@ -31,21 +28,28 @@ public class GameService {
 
 
     public List<ResponseGameMap> getAllMaps() {
-        return gameMapRepository.findAll()
-                .stream()
-                .map((map) -> new ResponseGameMap(
-                        map.getId(),
-                        map.getName(),
-                        map.getPreviewImgUrl(),
-                        map.getSwarms()
-                ))
-                .toList();
+        List<ResponseGameMap> maps = new ArrayList<>();
+
+        for (int i = 0; i < Maps.getMaps().size(); i++) {
+            GameMap map = Maps.getMaps().get(i);
+            maps.add(
+                    new ResponseGameMap(
+                            i,
+                            map.getName(),
+                            map.getPreviewImgUrl(),
+                            map.getSwarms()
+                    )
+            );
+        }
+
+        return maps;
     }
 
-    // TODO verify scripts are valid
     public GameReplay playGame(GameRequest gameRequest) {
-        GameMap map = gameMapRepository.findById(gameRequest.getMapId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Map not found."));
+        if (gameRequest.getMapId() > Maps.getMaps().size() || gameRequest.getMapId() < 0) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Map not found.");
+        }
+        GameMap map = Maps.getMaps().get(gameRequest.getMapId());
         List<Swarm> swarms = createSwarms(gameRequest.getScriptIds().stream().limit(map.getSwarms()).toList());
 
         Game game = gameFactory.createInstance(map.getFileName(), swarms);

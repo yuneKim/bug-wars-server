@@ -26,9 +26,3 @@ VALUES
         '[33, 5, 0, 35, 0, 12, 35, 0]', true),
     ((SELECT id FROM users WHERE username = 'test_user_2'), 'Spaghetti Strangler', 'Test Script 4',
         '[33, 5, 0, 35, 0, 12, 35, 0]', false);
-
-INSERT INTO maps (name, swarms, file_name, preview_img_url)
-VALUES
-    ('Fortress', 4, 'ns_fortress4.txt', 'https://i.imgur.com/NXFJ90l.png'),
-    ('Gladiators', 2, 'ns_arena.txt', 'https://i.imgur.com/e3tJLId.png'),
-    ('Faceoff', 2, 'ns_faceoff.txt', 'https://i.imgur.com/9cx1CUP.png');
