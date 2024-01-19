@@ -30,9 +30,11 @@ public class BugAssemblyParserTests {
 
     @Test
     public void parsesLabelAndTarget() throws BugAssemblyParseException {
-        String code = ":START\n" +
-                "      goto START";
-        Assertions.assertThat(parser.parse(code)).isEqualTo(List.of(35, 0));
+        String code = """
+                :START
+                    att
+                    goto START""";
+        Assertions.assertThat(parser.parse(code)).isEqualTo(List.of(13, 35, 0));
     }
 
     @Test
@@ -206,5 +208,30 @@ public class BugAssemblyParserTests {
                 .isInstanceOf(BugAssemblyParseException.class)
                 .hasMessageMatching("Problem on line (\\d+): '[^']+'. " +
                         "Did not recognize command '[^']+'");
+    }
+
+    @Test
+    public void throwsBugAssemblyParserExceptionWhenBytecodeWouldResultInInfiniteLoop() {
+        String code = """
+                :START
+                    ifEnemy ATTACK # a comment
+                    ifWall TURN_RIGHT
+                    goto START
+                                
+                :ATTACK
+                    att
+                    goto EAT
+                                
+                :EAT
+                    eat
+                    goto START
+                                
+                :TURN_RIGHT
+                    rotr
+                    goto START""";
+        //[30, 6, 34, 12, 35, 0, 13, 35, 9, 14, 35, 0, 11, 35, 0]
+        Assertions.assertThatThrownBy(() -> parser.parse(code))
+                .isInstanceOf(BugAssemblyParseException.class)
+                .hasMessageStartingWith("Infinite loop");
     }
 }

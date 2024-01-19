@@ -27,6 +27,7 @@ public class BugAssemblyParser {
 
         checkForMissingDestinations();
         fixDanglingLabelDefinition();
+        checkForInfiniteLoop();
         return bytecode;
     }
 
@@ -58,6 +59,7 @@ public class BugAssemblyParser {
                 .matcher(line)
                 .results()
                 .map(MatchResult::group)
+                .filter((s) -> !s.matches("\\u00a0"))
                 .toArray(String[]::new);
     }
 
@@ -203,5 +205,45 @@ public class BugAssemblyParser {
         if (controls.containsValue(penultimateCommand) && ultimateCommand >= bytecode.size()) {
             bytecode.set(bytecode.size() - 1, 0);
         }
+    }
+
+    private void checkForInfiniteLoop() throws BugAssemblyParseException {
+        for (int trueCondition : controls.values()) {
+            if (hasCycle(trueCondition)) {
+                String control = getControlByValue(trueCondition);
+
+                throw new BugAssemblyParseException(String.format("Infinite loop occurs if %s is true.", control));
+            }
+        }
+    }
+
+    // floyd's cycle-finding algorithm
+    private boolean hasCycle(int trueCondition) {
+        int slow = 0;
+        int fast = 0;
+        while (!actions.containsValue(bytecode.get(slow)) && !actions.containsValue(bytecode.get(fast))) {
+            slow = nextInstruction(slow, trueCondition);
+
+            fast = nextInstruction(fast, trueCondition);
+            fast = nextInstruction(fast, trueCondition);
+
+            if (slow == fast) return true;
+        }
+        return false;
+    }
+
+    private int nextInstruction(int i, int trueCondition) {
+        if (List.of(trueCondition, controls.get("goto")).contains(bytecode.get(i))) {
+            return bytecode.get(i + 1);
+        } else {
+            return (i + 2) % bytecode.size();
+        }
+    }
+
+    private String getControlByValue(int trueCondition) {
+        for (Map.Entry<String, Integer> entry : controls.entrySet()) {
+            if (entry.getValue() == trueCondition) return entry.getKey();
+        }
+        throw new IllegalArgumentException("Condition not in map.");
     }
 }
