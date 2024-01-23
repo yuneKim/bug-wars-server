@@ -125,7 +125,7 @@ public class ScriptServiceTests {
 
         Principal mockPrincipal = Mockito.mock(Principal.class);
         when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.of(USER));
-        when(scriptRepository.existsByName(Mockito.any())).thenReturn(true);
+        when(scriptRepository.existsByNameIgnoreCase(Mockito.any())).thenReturn(true);
 
         Assertions.assertThatThrownBy(() -> scriptService.createScript(request, mockPrincipal))
                 .isInstanceOf(ResponseStatusException.class)
@@ -141,7 +141,7 @@ public class ScriptServiceTests {
 
 
         when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.of(USER));
-        when(scriptRepository.existsByName(Mockito.any())).thenReturn(false);
+        when(scriptRepository.existsByNameIgnoreCase(Mockito.any())).thenReturn(false);
         when(bugAssemblyParserFactory.createInstance()).thenReturn(bugAssemblyParser);
         when(bugAssemblyParser.parse(request.getRaw())).thenReturn(expectedResult);
         when(scriptRepository.save(Mockito.any(Script.class))).thenReturn(SCRIPT_1);
@@ -161,7 +161,7 @@ public class ScriptServiceTests {
 
 
         when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.of(USER));
-        when(scriptRepository.existsByName(Mockito.any())).thenReturn(false);
+        when(scriptRepository.existsByNameIgnoreCase(Mockito.any())).thenReturn(false);
         when(bugAssemblyParserFactory.createInstance()).thenReturn(bugAssemblyParser);
         when(bugAssemblyParser.parse(request.getRaw())).thenThrow(BugAssemblyParseException.class);
         when(scriptRepository.save(Mockito.any(Script.class))).thenReturn(testScript);

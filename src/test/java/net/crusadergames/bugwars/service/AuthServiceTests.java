@@ -62,8 +62,8 @@ public class AuthServiceTests {
     public void registerUser_returnsUser() {
         SignupRequest signupRequest = new SignupRequest("test_user", "test@gmail.com", "password111");
         User user = new User(signupRequest.getUsername(), signupRequest.getEmail(), signupRequest.getPassword());
-        when(userRepository.existsByUsername(Mockito.any())).thenReturn(false);
-        when(userRepository.existsByEmail(Mockito.any())).thenReturn(false);
+        when(userRepository.existsByUsernameIgnoreCase(Mockito.any())).thenReturn(false);
+        when(userRepository.existsByEmailIgnoreCase(Mockito.any())).thenReturn(false);
         when(userRepository.save(Mockito.any(User.class))).thenReturn(user);
         when(roleRepository.findByName(Mockito.any(ERole.class))).thenReturn(Optional.of(new Role(1, ERole.ROLE_USER)));
 
@@ -75,7 +75,7 @@ public class AuthServiceTests {
     @Test
     public void registerUser_respondsWithConflictStatusOnDuplicateUsername() {
         SignupRequest signupRequest = new SignupRequest("test_user", "test@gmail.com", "password111");
-        when(userRepository.existsByUsername(Mockito.any())).thenReturn(true);
+        when(userRepository.existsByUsernameIgnoreCase(Mockito.any())).thenReturn(true);
 
         Assertions.assertThatThrownBy(() -> authService.registerUser(signupRequest))
                 .isInstanceOf(ResponseStatusException.class)
@@ -85,7 +85,7 @@ public class AuthServiceTests {
     @Test
     public void registerUser_respondsWithConflictStatusOnDuplicateEmail() {
         SignupRequest signupRequest = new SignupRequest("test_user", "test@gmail.com", "password111");
-        when(userRepository.existsByEmail(Mockito.any())).thenReturn(true);
+        when(userRepository.existsByEmailIgnoreCase(Mockito.any())).thenReturn(true);
 
         Assertions.assertThatThrownBy(() -> authService.registerUser(signupRequest))
                 .isInstanceOf(ResponseStatusException.class)

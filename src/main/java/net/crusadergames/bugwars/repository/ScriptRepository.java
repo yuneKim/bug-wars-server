@@ -14,6 +14,6 @@ public interface ScriptRepository extends JpaRepository<Script, Long> {
 
     List<Script> findByIsBytecodeValidTrue();
 
-    Boolean existsByName(String name);
+    Boolean existsByNameIgnoreCase(String name);
 
 }
