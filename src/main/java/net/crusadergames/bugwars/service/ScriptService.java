@@ -64,7 +64,7 @@ public class ScriptService {
         User user = getUser(principal);
         BugAssemblyParser parser = bugAssemblyParserFactory.createInstance();
 
-        if (scriptRepository.existsByName(request.getName())) {
+        if (scriptRepository.existsByNameIgnoreCase(request.getName())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Script by this name already exists");
         }
 

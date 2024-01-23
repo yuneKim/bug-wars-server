@@ -52,11 +52,11 @@ public class AuthService {
     private JwtUtils jwtUtils;
 
     public User registerUser(SignupRequest signUpRequest) {
-        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
+        if (userRepository.existsByUsernameIgnoreCase(signUpRequest.getUsername())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Username is already taken");
         }
 
-        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+        if (userRepository.existsByEmailIgnoreCase(signUpRequest.getEmail())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already taken");
         }
 
