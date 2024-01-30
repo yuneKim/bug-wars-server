@@ -1,5 +1,6 @@
 package net.crusadergames.bugwars.service;
 
+import com.modernmt.text.profanity.ProfanityFilter;
 import net.crusadergames.bugwars.dto.request.ModifyScriptRequest;
 import net.crusadergames.bugwars.dto.response.ScriptName;
 import net.crusadergames.bugwars.model.Script;
@@ -133,6 +134,20 @@ public class ScriptServiceTests {
     }
 
     @Test
+    public void createScript_respondsWithConflictStatusOnInappropriateName() {
+        ModifyScriptRequest request = new ModifyScriptRequest("Fucking Strawberries", ":START\ngoto START");
+
+        Principal mockPrincipal = Mockito.mock(Principal.class);
+        when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.of(USER));
+        when(scriptRepository.existsByNameIgnoreCase(Mockito.any())).thenReturn(false);
+
+        Assertions.assertThatThrownBy(() -> scriptService.createScript(request, mockPrincipal))
+                .isInstanceOf(ResponseStatusException.class)
+                .hasFieldOrPropertyWithValue("status", HttpStatus.BAD_REQUEST);
+    }
+
+
+    @Test
     public void createScript_returnsCreatedScript() throws BugAssemblyParseException, JsonProcessingException {
         List<Integer> expectedResult = List.of(35, 0);
         Principal mockPrincipal = Mockito.mock(Principal.class);
@@ -242,6 +257,20 @@ public class ScriptServiceTests {
 
         Assertions.assertThat(updatedScript.isBytecodeValid()).isFalse();
     }
+
+    @Test
+    public void updateScript_throwsConflictStatusOnInappropriateName() throws BugAssemblyParseException, JsonProcessingException {
+        Principal mockPrincipal = Mockito.mock(Principal.class);
+        ModifyScriptRequest request = new ModifyScriptRequest("Fucking Robbery", ":START\ngoto START");
+        USER.setId(1l);
+        when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.of(USER));
+        when(scriptRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(SCRIPT_1));
+
+        Assertions.assertThatThrownBy(() -> scriptService.updateScript(1L, mockPrincipal, request))
+                .isInstanceOf(ResponseStatusException.class)
+                .hasFieldOrPropertyWithValue("status", HttpStatus.BAD_REQUEST);
+    }
+
 
     @Test
     public void deleteScriptById_returnsForbiddenStatusWhenUserIdsDontMatch() {
