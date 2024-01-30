@@ -42,4 +42,9 @@ public class AuthController {
     public void logout(Principal principal) {
         authService.logout(principal);
     }
+
+    @PostMapping("/verify/{username}/{token}")
+    public boolean verifyEmail(@PathVariable String username, @PathVariable String token) {
+        return authService.verifyEmailToken(token, username);
+    }
 }

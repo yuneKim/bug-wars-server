@@ -13,6 +13,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import net.crusadergames.bugwars.model.Script;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -49,6 +51,13 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Script> scripts;
+
+    @Column(nullable = true)
+    private boolean isEmailVerified;
+
+    private String emailVerificationToken;
+
+    private LocalDateTime emailVerificationExpiry;
 
     @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY)

@@ -18,6 +18,7 @@ import net.crusadergames.bugwars.security.service.UserDetailsImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,6 +29,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.UUID;
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
@@ -50,6 +54,8 @@ public class AuthService {
     private AuthenticationManager authenticationManager;
     @Autowired
     private JwtUtils jwtUtils;
+    @Autowired
+    private EmailService emailService;
 
     public User registerUser(SignupRequest signUpRequest) {
         if (userRepository.existsByUsernameIgnoreCase(signUpRequest.getUsername())) {
@@ -69,6 +75,15 @@ public class AuthService {
         }
         Role userRole = optUserRole.get();
         user.setRoles(Set.of(userRole));
+
+        user.setEmailVerified(false);
+
+        user.setEmailVerificationExpiry(LocalDateTime.now().plusDays(7L));
+
+        String verificationToken = UUID.randomUUID().toString();
+        user.setEmailVerificationToken(verificationToken);
+
+        emailService.sendVerificationLink(user);
         return userRepository.save(user);
     }
 
@@ -107,5 +122,13 @@ public class AuthService {
 
         User user = userRepository.findByUsername(principal.getName()).orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
         refreshTokenService.deleteByUserId(user.getId());
+    }
+
+    public boolean verifyEmailToken(String token, String username) {
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
+        if (token.equals(user.getEmailVerificationToken()) ){
+            user.setEmailVerified(true);
+        }
+        return user.isEmailVerified();
     }
 }
