@@ -1,5 +1,6 @@
 package net.crusadergames.bugwars.service;
 
+import com.modernmt.text.profanity.ProfanityFilter;
 import net.crusadergames.bugwars.dto.request.ModifyScriptRequest;
 import net.crusadergames.bugwars.dto.response.ScriptName;
 import net.crusadergames.bugwars.model.Script;
@@ -63,9 +64,14 @@ public class ScriptService {
         Script script = new Script();
         User user = getUser(principal);
         BugAssemblyParser parser = bugAssemblyParserFactory.createInstance();
+        ProfanityFilter profanityFilter = new ProfanityFilter();
 
         if (scriptRepository.existsByNameIgnoreCase(request.getName())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Script by this name already exists");
+        }
+
+        if (profanityFilter.test("en", request.getName())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Inappropriate language.");
         }
 
         List<Integer> byteCode;
@@ -89,11 +95,15 @@ public class ScriptService {
         User user = getUser(principal);
         Optional<Script> existingScript = scriptRepository.findById(scriptId);
         BugAssemblyParser parser = bugAssemblyParserFactory.createInstance();
+        ProfanityFilter profanityFilter = new ProfanityFilter();
         if (existingScript.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Script does not exist.");
         }
         if (!existingScript.get().getUser().getId().equals(user.getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This user does not have access to this script.");
+        }
+        if (profanityFilter.test("en", request.getName())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Inappropriate language.");
         }
         Script scriptToSave = existingScript.get();
         List<Integer> byteCode;

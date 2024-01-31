@@ -84,6 +84,11 @@
             <artifactId>postgresql</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.modernmt.text</groupId>
+            <artifactId>profanity-filter</artifactId>
+            <version>1.0.1</version>
+        </dependency>
     </dependencies>
 
     <build>
