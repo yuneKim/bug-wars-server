@@ -1,5 +1,6 @@
 package net.crusadergames.bugwars.service;
 
+import com.modernmt.text.profanity.ProfanityFilter;
 import net.crusadergames.bugwars.dto.request.LoginRequest;
 import net.crusadergames.bugwars.dto.request.SignupRequest;
 import net.crusadergames.bugwars.dto.request.TokenRefreshRequest;
@@ -52,12 +53,19 @@ public class AuthService {
     private JwtUtils jwtUtils;
 
     public User registerUser(SignupRequest signUpRequest) {
+
+        ProfanityFilter profanityFilter = new ProfanityFilter();
+
         if (userRepository.existsByUsernameIgnoreCase(signUpRequest.getUsername())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Username is already taken");
         }
 
         if (userRepository.existsByEmailIgnoreCase(signUpRequest.getEmail())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already taken");
+        }
+
+        if (profanityFilter.test("en", signUpRequest.getUsername())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Inappropriate language.");
         }
 
         User user = new User(signUpRequest.getUsername(), signUpRequest.getEmail(),
