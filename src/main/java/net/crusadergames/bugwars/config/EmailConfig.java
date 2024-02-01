@@ -63,7 +63,7 @@ public class EmailConfig {
     public void deleteExpiredAccounts() {
         List<User> users = userRepository.findByIsEmailVerifiedFalse();
         for (User user : users) {
-            if (user.getEmailVerificationExpiry().isAfter(LocalDateTime.now())) {
+            if (LocalDateTime.now().isAfter(user.getEmailVerificationExpiry())) {
                 userRepository.delete(user);
             }
         }
