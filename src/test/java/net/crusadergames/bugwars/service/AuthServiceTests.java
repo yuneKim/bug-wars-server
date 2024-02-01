@@ -93,6 +93,16 @@ public class AuthServiceTests {
     }
 
     @Test
+    public void registerUser_respondsWithErrorMessageOnInappropriateUsername() {
+        SignupRequest signupRequest = new SignupRequest("fuck asdfa", "test@gmail.com", "password111");
+        when(userRepository.existsByEmailIgnoreCase(Mockito.any())).thenReturn(false);
+
+        Assertions.assertThatThrownBy(() -> authService.registerUser(signupRequest))
+                .isInstanceOf(ResponseStatusException.class)
+                .hasFieldOrPropertyWithValue("status", HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
     public void registerUser_respondsWithServerErrorOnMissingRole() {
         SignupRequest signupRequest = new SignupRequest("test_user", "test@gmail.com", "password111");
         when(roleRepository.findByName(Mockito.any())).thenReturn(Optional.empty());
@@ -171,4 +181,5 @@ public class AuthServiceTests {
                 .isInstanceOf(ResponseStatusException.class)
                 .hasFieldOrPropertyWithValue("status", HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
 }
