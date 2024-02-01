@@ -1,16 +1,28 @@
 package net.crusadergames.bugwars.config;
 
+import net.crusadergames.bugwars.model.auth.User;
+import net.crusadergames.bugwars.repository.auth.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cglib.core.Local;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Properties;
 
 @Configuration
+@EnableScheduling
 public class EmailConfig {
+
+    @Autowired
+    UserRepository userRepository;
 
     @Value("${spring.mail.username}")
     String username;
@@ -20,7 +32,6 @@ public class EmailConfig {
 
     @Bean
     public JavaMailSender getJavaMailSender() {
-        System.out.println(username + password);
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost("smtp.gmail.com");
         mailSender.setPort(465);
@@ -46,5 +57,15 @@ public class EmailConfig {
         message.setFrom("example2@gmail.com");
         message.setText("test email template");
         return message;
+    }
+
+    @Scheduled(cron = "0 0 0 * * ?")
+    public void deleteExpiredAccounts() {
+        List<User> users = userRepository.findByIsEmailVerifiedFalse();
+        for (User user : users) {
+            if (user.getEmailVerificationExpiry().isAfter(LocalDateTime.now())) {
+                userRepository.delete(user);
+            }
+        }
     }
 }
