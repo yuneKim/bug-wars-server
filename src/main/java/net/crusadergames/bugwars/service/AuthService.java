@@ -4,6 +4,7 @@ import com.modernmt.text.profanity.ProfanityFilter;
 import net.crusadergames.bugwars.dto.request.LoginRequest;
 import net.crusadergames.bugwars.dto.request.SignupRequest;
 import net.crusadergames.bugwars.dto.request.TokenRefreshRequest;
+import net.crusadergames.bugwars.dto.request.UpdateProfileRequest;
 import net.crusadergames.bugwars.dto.response.JwtResponse;
 import net.crusadergames.bugwars.dto.response.TokenRefreshResponse;
 import net.crusadergames.bugwars.exception.TokenRefreshException;
@@ -116,4 +117,25 @@ public class AuthService {
         User user = userRepository.findByUsername(principal.getName()).orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
         refreshTokenService.deleteByUserId(user.getId());
     }
+
+    public User updateUserProfile(UpdateProfileRequest updateProfileRequest, Principal principal) {
+        User user = userRepository.findByUsername(updateProfileRequest.getUsername())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, "User is not found"));
+        if (updateProfileRequest.getUsername() != null && !updateProfileRequest.getUsername().isEmpty()) {
+            user.setUsername(updateProfileRequest.getUsername());
+        }
+
+
+        if (updateProfileRequest.getEmail() != null && !updateProfileRequest.getEmail().isEmpty()) {
+            user.setEmail(updateProfileRequest.getEmail());
+        }
+
+
+        if (updateProfileRequest.getNewPassword() != null && !updateProfileRequest.getNewPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(updateProfileRequest.getNewPassword()));
+        }
+
+        return userRepository.save(user);
+    }
 }
+

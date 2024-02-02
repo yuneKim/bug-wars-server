@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import net.crusadergames.bugwars.dto.request.LoginRequest;
 import net.crusadergames.bugwars.dto.request.SignupRequest;
 import net.crusadergames.bugwars.dto.request.TokenRefreshRequest;
+import net.crusadergames.bugwars.dto.request.UpdateProfileRequest;
 import net.crusadergames.bugwars.dto.response.JwtResponse;
 import net.crusadergames.bugwars.dto.response.TokenRefreshResponse;
 import net.crusadergames.bugwars.model.auth.User;
@@ -42,4 +43,10 @@ public class AuthController {
     public void logout(Principal principal) {
         authService.logout(principal);
     }
+
+    @PutMapping("/update-profile")
+    public User updateProfile(@Valid @RequestBody UpdateProfileRequest updateProfileRequest, Principal principal) {
+        return authService.updateUserProfile(updateProfileRequest, principal);
+    }
 }
+
