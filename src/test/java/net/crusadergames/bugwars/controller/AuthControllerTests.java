@@ -12,6 +12,8 @@ import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -88,6 +90,12 @@ public class AuthControllerTests {
     @Test
     public void logout_returnsOkStatus() throws Exception {
         mockMvc.perform(post("/api/auth/logout"))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    public void verifyEmail_shouldVerifyEmailToken() throws Exception {
+        mockMvc.perform(post("/api/auth/verify/BugWarsUser/49370bea-5a8c-4fba-8887-980e1b320b14"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 }
