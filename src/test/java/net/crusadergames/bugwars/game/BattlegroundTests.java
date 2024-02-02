@@ -26,10 +26,10 @@ public class BattlegroundTests {
     public void returnsTickSummary() {
         Resource mapFile = loader.getResource(BASE_PATH + "ns_arena_mini.txt");
         List<Swarm> swarms = List.of(
-                new Swarm("Swarm 1", new int[]{10}),
-                new Swarm("Swarm 2", new int[]{11}),
-                new Swarm("Swarm 3", new int[]{12}),
-                new Swarm("Swarm 4", new int[]{13})
+                new Swarm("Swarm 1", "User1", new int[]{10}),
+                new Swarm("Swarm 2", "User2", new int[]{11}),
+                new Swarm("Swarm 3", "User3", new int[]{12}),
+                new Swarm("Swarm 4", "User4", new int[]{13})
         );
         Battleground battleground = new BattlegroundFactory(mapFile, swarms).createBattleground();
         TickSummary tickSummary = battleground.nextTick();
@@ -41,10 +41,10 @@ public class BattlegroundTests {
     public void throwsRuntimeExceptionOnInvalidAction() {
         Resource mapFile = loader.getResource(BASE_PATH + "ns_arena_mini.txt");
         List<Swarm> swarms = List.of(
-                new Swarm("Swarm 1", new int[]{9}),
-                new Swarm("Swarm 2", new int[]{11}),
-                new Swarm("Swarm 3", new int[]{12}),
-                new Swarm("Swarm 4", new int[]{13})
+                new Swarm("Swarm 1", "User1", new int[]{9}),
+                new Swarm("Swarm 2", "User2", new int[]{11}),
+                new Swarm("Swarm 3", "User3", new int[]{12}),
+                new Swarm("Swarm 4", "User4", new int[]{13})
         );
         Battleground battleground = new BattlegroundFactory(mapFile, swarms).createBattleground();
         Assertions.assertThatThrownBy(battleground::nextTick)
@@ -55,8 +55,8 @@ public class BattlegroundTests {
     public void handlesAttAction() {
         Resource mapFile = loader.getResource(BASE_PATH + "ns_arena_mini3.txt");
         List<Swarm> swarms = List.of(
-                new Swarm("Swarm 1", new int[]{10}),
-                new Swarm("Swarm 2", new int[]{13})
+                new Swarm("Swarm 1", "User1", new int[]{10}),
+                new Swarm("Swarm 2", "User2", new int[]{13})
         );
         Battleground battleground = new BattlegroundFactory(mapFile, swarms).createBattleground();
         for (int i = 0; i < 3; i++) {
@@ -73,8 +73,8 @@ public class BattlegroundTests {
     public void handlesEatAction() {
         Resource mapFile = loader.getResource(BASE_PATH + "ns_arena_mini3.txt");
         List<Swarm> swarms = List.of(
-                new Swarm("Swarm 1", new int[]{10}),
-                new Swarm("Swarm 2", new int[]{13, 14})
+                new Swarm("Swarm 1", "User1", new int[]{10}),
+                new Swarm("Swarm 2", "User2", new int[]{13, 14})
         );
         Battleground battleground = new BattlegroundFactory(mapFile, swarms).createBattleground();
         for (int i = 0; i < 3; i++) {

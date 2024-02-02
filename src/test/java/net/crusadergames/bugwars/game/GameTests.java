@@ -16,7 +16,7 @@ public class GameTests {
     @Test
     public void simulatesCorrectNumberOfTicks() {
         Battleground battleground = Mockito.mock(Battleground.class);
-        List<Swarm> swarms = List.of(new Swarm("Swarm1", new int[]{10}), new Swarm("Swarm2", new int[]{10}));
+        List<Swarm> swarms = List.of(new Swarm("Swarm1", "User1", new int[]{10}), new Swarm("Swarm2", "User2", new int[]{10}));
 
         when(battleground.getGrid()).thenReturn(new Entity[][]{});
         when(battleground.nextTick()).thenReturn(new TickSummary());
@@ -29,7 +29,7 @@ public class GameTests {
     @Test
     public void returnsGameReplay() {
         Battleground battleground = Mockito.mock(Battleground.class);
-        List<Swarm> swarms = List.of(new Swarm("Swarm1", new int[]{10}), new Swarm("Swarm2", new int[]{10}));
+        List<Swarm> swarms = List.of(new Swarm("Swarm1", "User1", new int[]{10}), new Swarm("Swarm2", "User2", new int[]{10}));
 
         when(battleground.getGrid()).thenReturn(new Entity[][]{});
         when(battleground.nextTick()).thenReturn(new TickSummary());
@@ -42,7 +42,7 @@ public class GameTests {
     @Test
     public void endsEarlyIfOneSwarmLeft() {
         Battleground battleground = Mockito.mock(Battleground.class);
-        List<Swarm> swarms = List.of(new Swarm("Swarm1", new int[]{10}), new Swarm("Swarm2", new int[]{10}));
+        List<Swarm> swarms = List.of(new Swarm("Swarm1", "User1", new int[]{10}), new Swarm("Swarm2", "User2", new int[]{10}));
 
         when(battleground.getGrid()).thenReturn(new Entity[][]{});
         when(battleground.nextTick()).thenReturn(new TickSummary(List.of(), true));
