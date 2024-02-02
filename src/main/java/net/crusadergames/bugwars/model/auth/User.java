@@ -52,11 +52,14 @@ public class User {
     @JsonIgnore
     private List<Script> scripts;
 
+    @JsonIgnore
     @Column(nullable = true)
     private boolean isEmailVerified;
 
+    @JsonIgnore
     private String emailVerificationToken;
 
+    @JsonIgnore
     private LocalDateTime emailVerificationExpiry;
 
     @JsonIgnore

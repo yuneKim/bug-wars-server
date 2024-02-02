@@ -134,6 +134,7 @@ public class AuthService {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
         if (token.equals(user.getEmailVerificationToken()) ){
             user.setEmailVerified(true);
+            userRepository.save(user);
         }
         return user.isEmailVerified();
     }

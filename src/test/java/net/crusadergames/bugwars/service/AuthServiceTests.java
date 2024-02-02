@@ -58,6 +58,9 @@ public class AuthServiceTests {
     @InjectMocks
     private AuthService authService;
 
+    @Mock
+    private EmailService emailService;
+
     @Test
     public void registerUser_returnsUser() {
         SignupRequest signupRequest = new SignupRequest("test_user", "test@gmail.com", "password111");
@@ -180,6 +183,16 @@ public class AuthServiceTests {
         Assertions.assertThatThrownBy(() -> authService.logout(mockPrincipal))
                 .isInstanceOf(ResponseStatusException.class)
                 .hasFieldOrPropertyWithValue("status", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Test
+    void verifyEmailToken_shouldReturnTrue() {
+
+    }
+
+    @Test
+    void verifyEmailToken_shouldReturnFalse() {
+
     }
 
 }

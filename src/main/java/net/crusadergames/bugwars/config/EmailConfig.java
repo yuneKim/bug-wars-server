@@ -50,15 +50,6 @@ public class EmailConfig {
         return mailSender;
     }
 
-    @Bean
-    public SimpleMailMessage emailTemplate() {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo("example@gmail.com");
-        message.setFrom("example2@gmail.com");
-        message.setText("test email template");
-        return message;
-    }
-
     @Scheduled(cron = "0 0 0 * * ?")
     public void deleteExpiredAccounts() {
         List<User> users = userRepository.findByIsEmailVerifiedFalse();
