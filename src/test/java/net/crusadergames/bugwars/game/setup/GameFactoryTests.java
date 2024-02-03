@@ -37,10 +37,10 @@ public class GameFactoryTests {
     public void createsGameInstance() {
         when(loader.getResource(Mockito.anyString())).thenAnswer((invocation) -> testLoader.getResource(invocation.getArgument(0)));
         List<Swarm> swarms = List.of(
-                new Swarm("Swarm 1", new int[]{10}),
-                new Swarm("Swarm 2", new int[]{10}),
-                new Swarm("Swarm 3", new int[]{10}),
-                new Swarm("Swarm 4", new int[]{10})
+                new Swarm("Swarm 1", "User1", new int[]{10}),
+                new Swarm("Swarm 2", "User2", new int[]{10}),
+                new Swarm("Swarm 3", "User3", new int[]{10}),
+                new Swarm("Swarm 4", "User4", new int[]{10})
         );
 
         Game game = gameFactory.createInstance("ns_arena_mini.txt", swarms);
@@ -51,10 +51,10 @@ public class GameFactoryTests {
     public void throwsGameInitializationExceptionOnInvalidMap() {
         when(loader.getResource(Mockito.anyString())).thenAnswer((invocation) -> testLoader.getResource(invocation.getArgument(0)));
         List<Swarm> swarms = List.of(
-                new Swarm("Swarm 1", new int[]{10}),
-                new Swarm("Swarm 2", new int[]{10}),
-                new Swarm("Swarm 3", new int[]{10}),
-                new Swarm("Swarm 4", new int[]{10})
+                new Swarm("Swarm 1", "User1", new int[]{10}),
+                new Swarm("Swarm 2", "User2", new int[]{10}),
+                new Swarm("Swarm 3", "User3", new int[]{10}),
+                new Swarm("Swarm 4", "User4", new int[]{10})
         );
 
         Assertions.assertThatThrownBy(() -> gameFactory.createInstance("ns_arena_mini_invalid.txt", swarms))
@@ -65,10 +65,10 @@ public class GameFactoryTests {
     public void throwsGameInitializationExceptionOnFailureToLoadMap() {
         when(loader.getResource(Mockito.anyString())).thenAnswer((invocation) -> testLoader.getResource(invocation.getArgument(0)));
         List<Swarm> swarms = List.of(
-                new Swarm("Swarm 1", new int[]{10}),
-                new Swarm("Swarm 2", new int[]{10}),
-                new Swarm("Swarm 3", new int[]{10}),
-                new Swarm("Swarm 4", new int[]{10})
+                new Swarm("Swarm 1", "User1", new int[]{10}),
+                new Swarm("Swarm 2", "User2", new int[]{10}),
+                new Swarm("Swarm 3", "User3", new int[]{10}),
+                new Swarm("Swarm 4", "User4", new int[]{10})
         );
 
         Assertions.assertThatThrownBy(() -> gameFactory.createInstance("ns_arena_mi.txt", swarms))

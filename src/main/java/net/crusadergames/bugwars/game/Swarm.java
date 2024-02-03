@@ -7,5 +7,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class Swarm {
     private String name;
+    private String author;
     private int[] bytecode;
 }
