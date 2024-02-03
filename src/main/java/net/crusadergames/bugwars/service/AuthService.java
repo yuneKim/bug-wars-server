@@ -7,6 +7,7 @@ import net.crusadergames.bugwars.dto.request.TokenRefreshRequest;
 import net.crusadergames.bugwars.dto.request.UpdateProfileRequest;
 import net.crusadergames.bugwars.dto.response.JwtResponse;
 import net.crusadergames.bugwars.dto.response.TokenRefreshResponse;
+import net.crusadergames.bugwars.dto.response.UserProfileResponse;
 import net.crusadergames.bugwars.exception.TokenRefreshException;
 import net.crusadergames.bugwars.model.auth.ERole;
 import net.crusadergames.bugwars.model.auth.RefreshToken;
@@ -120,7 +121,7 @@ public class AuthService {
 
     public User updateUserProfile(UpdateProfileRequest updateProfileRequest, Principal principal) {
         User user = userRepository.findByUsername(updateProfileRequest.getUsername())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, "User is not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, "User not found"));
         if (updateProfileRequest.getUsername() != null && !updateProfileRequest.getUsername().isEmpty()) {
             user.setUsername(updateProfileRequest.getUsername());
         }
@@ -136,6 +137,13 @@ public class AuthService {
         }
 
         return userRepository.save(user);
+    }
+
+    public UserProfileResponse getUserProfile(Principal principal) {
+        User user = userRepository.findByUsername(principal.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        return new UserProfileResponse(user.getUsername(), user.getEmail(), user.getProfilePicture(), user.getAmountOfScripts());
     }
 }
 

@@ -7,6 +7,7 @@ import net.crusadergames.bugwars.dto.request.TokenRefreshRequest;
 import net.crusadergames.bugwars.dto.request.UpdateProfileRequest;
 import net.crusadergames.bugwars.dto.response.JwtResponse;
 import net.crusadergames.bugwars.dto.response.TokenRefreshResponse;
+import net.crusadergames.bugwars.dto.response.UserProfileResponse;
 import net.crusadergames.bugwars.model.auth.User;
 import net.crusadergames.bugwars.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,5 +49,11 @@ public class AuthController {
     public User updateProfile(@Valid @RequestBody UpdateProfileRequest updateProfileRequest, Principal principal) {
         return authService.updateUserProfile(updateProfileRequest, principal);
     }
+
+    @GetMapping("/user-profile")
+    public UserProfileResponse getUserProfile(Principal principal) {
+        return authService.getUserProfile(principal);
+    }
+
 }
 
