@@ -3,7 +3,9 @@ package net.crusadergames.bugwars.service;
 import net.crusadergames.bugwars.dto.request.LoginRequest;
 import net.crusadergames.bugwars.dto.request.SignupRequest;
 import net.crusadergames.bugwars.dto.request.TokenRefreshRequest;
+import net.crusadergames.bugwars.dto.request.UpdateProfileRequest;
 import net.crusadergames.bugwars.dto.response.JwtResponse;
+import net.crusadergames.bugwars.dto.response.UserProfileResponse;
 import net.crusadergames.bugwars.exception.TokenRefreshException;
 import net.crusadergames.bugwars.model.auth.ERole;
 import net.crusadergames.bugwars.model.auth.RefreshToken;
@@ -181,5 +183,43 @@ public class AuthServiceTests {
                 .isInstanceOf(ResponseStatusException.class)
                 .hasFieldOrPropertyWithValue("status", HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+//    @Test
+//    public void updateUserProfile_returnsUser() {
+//        UpdateProfileRequest updateProfileRequest = new UpdateProfileRequest("test_user", "test@gmail.com", "password111");
+//        User user = new User(updateProfileRequest.getUsername(), updateProfileRequest.getEmail(), updateProfileRequest.getNewPassword());
+//        when(userRepository.existsByUsernameIgnoreCase(Mockito.any())).thenReturn(false);
+//        when(userRepository.existsByEmailIgnoreCase(Mockito.any())).thenReturn(false);
+//        when(userRepository.save(Mockito.any(User.class))).thenReturn(user);
+//        when(roleRepository.findByName(Mockito.any(ERole.class))).thenReturn(Optional.of(new Role(1, ERole.ROLE_USER)));
+//
+//        User savedUser = authService.updateUserProfile(updateProfileRequest);
+//
+//        Assertions.assertThat(savedUser).isNotNull();
+//    }
+
+//    @Test
+//    public void updateUserProfile_respondsWithErrorMessageOnInappropriateUsername() {
+//        UpdateProfileRequest updateProfileRequest = new UpdateProfileRequest("fuck asdfa", "test@gmail.com", "password111");
+//        when(userRepository.existsByEmailIgnoreCase(Mockito.any())).thenReturn(false);
+//
+//        Assertions.assertThatThrownBy(() -> authService.updateUserProfile(updateProfileRequest))
+//                .isInstanceOf(ResponseStatusException.class)
+//                .hasFieldOrPropertyWithValue("status", HttpStatus.BAD_REQUEST);
+//    }
+
+//    @Test
+//    public void getUserProfile_returnsUser() {
+//        UserProfileResponse userProfileResponse = new UserProfileResponse("test_user", "test@gmail.com", "1", 1);
+//        User user = new User(userProfileResponse.getUsername(), userProfileResponse.getEmail(), userProfileResponse.getProfilePicture());
+//        when(userRepository.existsByUsernameIgnoreCase(Mockito.any())).thenReturn(false);
+//        when(userRepository.existsByEmailIgnoreCase(Mockito.any())).thenReturn(false);
+//        when(userRepository.save(Mockito.any(User.class))).thenReturn(user);
+//        when(roleRepository.findByName(Mockito.any(ERole.class))).thenReturn(Optional.of(new Role(1, ERole.ROLE_USER)));
+//
+//        User savedUser = authService.getUserProfile(userProfileResponse);
+//
+//        Assertions.assertThat(savedUser).isNotNull();
+//    }
 
 }

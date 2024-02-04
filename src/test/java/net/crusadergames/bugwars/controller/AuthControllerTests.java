@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import net.crusadergames.bugwars.dto.request.LoginRequest;
 import net.crusadergames.bugwars.dto.request.SignupRequest;
 import net.crusadergames.bugwars.dto.request.TokenRefreshRequest;
+import net.crusadergames.bugwars.dto.request.UpdateProfileRequest;
 import net.crusadergames.bugwars.dto.response.JwtResponse;
 import net.crusadergames.bugwars.dto.response.TokenRefreshResponse;
+import net.crusadergames.bugwars.dto.response.UserProfileResponse;
 import net.crusadergames.bugwars.model.auth.User;
 import net.crusadergames.bugwars.service.AuthService;
 import org.hamcrest.CoreMatchers;
@@ -25,7 +27,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @WebMvcTest(controllers = AuthController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -89,5 +91,34 @@ public class AuthControllerTests {
     public void logout_returnsOkStatus() throws Exception {
         mockMvc.perform(post("/api/auth/logout"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+//    @Test
+//    public void updateProfile_returnsUser() throws Exception {
+//        UpdateProfileRequest updateProfileRequest = new UpdateProfileRequest("test_user", "test@gmail.com", "password111");
+//        User user = new User(updateProfileRequest.getUsername(), updateProfileRequest.getEmail(), updateProfileRequest.getNewPassword());
+//        when(authService.updateUserProfile(ArgumentMatchers.any())).thenReturn(user);
+//
+//        ResultActions response = mockMvc.perform(put("/api/auth/update-profile")
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .content(objectMapper.writeValueAsString(updateProfileRequest)));
+//
+//        response.andExpect(MockMvcResultMatchers.status().isOk())
+//                .andExpect(MockMvcResultMatchers.jsonPath("$.username", CoreMatchers.is(updateProfileRequest.getUsername())));
+//
+//    }
+
+    @Test
+    public void getUserProfile_returnsUser() throws Exception {
+        UserProfileResponse userProfileResponse = new UserProfileResponse("test_user", "test@gmail.com", "1", 1);
+        User user = new User(userProfileResponse.getUsername(), userProfileResponse.getEmail(), userProfileResponse.getProfilePicture());
+        when(authService.getUserProfile(ArgumentMatchers.any())).thenReturn(userProfileResponse);
+
+        ResultActions response = mockMvc.perform(get("/api/auth/user-profile")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userProfileResponse)));
+
+        response.andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.username", CoreMatchers.is(userProfileResponse.getUsername())));
+
     }
 }
