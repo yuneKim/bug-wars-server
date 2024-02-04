@@ -47,7 +47,7 @@ public class ScriptControllerTests {
     @Test
     public void getAllNamesOfValidScripts_returnsValidScriptNames() throws Exception {
         when(scriptService.getAllNamesOfValidScripts()).thenReturn(
-                List.of(new ScriptName(1L, "Test1"), new ScriptName(2L, "Test2"))
+                List.of(new ScriptName(1L, "Test1", "User1"), new ScriptName(2L, "Test2", "User2"))
         );
 
         ResultActions response = mockMvc.perform(get("/api/scripts/all"));
