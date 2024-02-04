@@ -13,13 +13,18 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class EmailConfigTest {
 
-//    @Mock
-//    private JavaMailSender javaMailSender;
-//
-//    @Test
-//    void getMailSender_shouldReturnMailSender() {
-//        Mockito.when(JavaMailSender).thenReturn(javaMailSender);
-//    }
+    @Mock
+    private JavaMailSender javaMailSender;
+
+    @Test
+    void getMailSender_shouldReturnMailSender() {
+
+    }
+
+    @Test
+    void deleteExpiredAccounts_shouldDeleteExpiredAccounts() {
+
+    }
 
 
 }
