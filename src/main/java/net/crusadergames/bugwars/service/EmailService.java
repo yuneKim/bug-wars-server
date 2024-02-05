@@ -22,7 +22,7 @@ public class EmailService {
         mailMessage.setTo(user.getEmail());
         mailMessage.setSubject("Bug Wars: Verify Your Email");
         String htmlContent = "Welcome! \n" +
-                "Click http://localhost:5173/bug-wars-client#/email-verification/" + user.getUsername() + "/" + user.getEmailVerificationToken() +  " to verify your email.";
+                "Click https://yunekim.github.io/bug-wars-client#/email-verification/" + user.getUsername() + "/" + user.getEmailVerificationToken() +  " to verify your email.";
         mailMessage.setText(htmlContent);
         mailSender.send(mailMessage);
         return mailMessage;
