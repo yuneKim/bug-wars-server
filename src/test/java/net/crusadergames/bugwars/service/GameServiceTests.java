@@ -9,6 +9,7 @@ import net.crusadergames.bugwars.game.Swarm;
 import net.crusadergames.bugwars.game.entity.Entity;
 import net.crusadergames.bugwars.game.setup.GameFactory;
 import net.crusadergames.bugwars.model.Script;
+import net.crusadergames.bugwars.model.auth.User;
 import net.crusadergames.bugwars.repository.ScriptRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -49,10 +50,12 @@ public class GameServiceTests {
         GameRequest gameRequest = new GameRequest(List.of(1L, 2L), 1);
 
         Script script1 = new Script(1L, "Test1", "[13]");
+        script1.setUser(new User("User1", "user@user.com", "password"));
         Script script2 = new Script(2L, "Test2", "[10, 11]");
+        script2.setUser(new User("User2", "user@user.com", "password"));
         List<Swarm> swarms = List.of(
-                new Swarm("Test1", new int[]{13}),
-                new Swarm("Test2", new int[]{10, 11})
+                new Swarm("Test1", "User1", new int[]{13}),
+                new Swarm("Test2", "User2", new int[]{10, 11})
         );
         Game game = Mockito.mock(Game.class);
 
@@ -86,6 +89,7 @@ public class GameServiceTests {
         GameRequest gameRequest = new GameRequest(List.of(1L, 2L), 1);
 
         Script script1 = new Script(1L, "Test1", "[13]");
+        script1.setUser(new User("User1", "user@user.com", "password"));
 
         when(scriptRepository.findById(1L)).thenReturn(Optional.of(script1));
         when(scriptRepository.findById(2L)).thenReturn(Optional.empty());

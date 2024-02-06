@@ -36,7 +36,7 @@ public class ScriptService {
     public List<ScriptName> getAllNamesOfValidScripts() {
         return scriptRepository.findByIsBytecodeValidTrue()
                 .stream()
-                .map((script) -> new ScriptName(script.getId(), script.getName()))
+                .map((script) -> new ScriptName(script.getId(), script.getName(), script.getUser().getUsername()))
                 .toList();
     }
 

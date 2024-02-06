@@ -63,6 +63,7 @@ public class GameService {
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Invalid script."));
             swarms.add(new Swarm(
                     script.getName(),
+                    script.getUser().getUsername(),
                     script.deserializeBytecode()
             ));
         }
