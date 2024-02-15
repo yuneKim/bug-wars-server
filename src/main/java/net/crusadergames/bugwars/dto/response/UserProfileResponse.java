@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserProfileResponse {
     private String username;
+    private String profileName;
     private String email;
     private String profilePicture;
     private int scriptAmount;

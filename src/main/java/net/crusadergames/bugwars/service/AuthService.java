@@ -30,6 +30,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.security.Principal;
 import java.util.List;
@@ -72,6 +73,9 @@ public class AuthService {
 
         User user = new User(signUpRequest.getUsername(), signUpRequest.getEmail(),
                 passwordEncoder.encode(signUpRequest.getPassword()));
+
+        // Set profile name to be equal to username initially
+        user.setProfileName(signUpRequest.getUsername());
 
         Optional<Role> optUserRole = roleRepository.findByName(ERole.ROLE_USER);
         if (optUserRole.isEmpty()) {
@@ -120,30 +124,54 @@ public class AuthService {
     }
 
     public User updateUserProfile(UpdateProfileRequest updateProfileRequest, Principal principal) {
-        User user = userRepository.findByUsername(updateProfileRequest.getUsername())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.CONFLICT, "User not found"));
-        if (updateProfileRequest.getUsername() != null && !updateProfileRequest.getUsername().isEmpty()) {
-            user.setUsername(updateProfileRequest.getUsername());
+        if (principal == null) {
+            throw new IllegalArgumentException("Principal is null");
         }
 
+        User user = userRepository.findByUsername(principal.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        if (updateProfileRequest.getUsername() != null && !updateProfileRequest.getUsername().isEmpty()) {
+            if (!updateProfileRequest.getUsername().equals(user.getUsername())) {
+                user.setUsername(updateProfileRequest.getUsername());
+                user.setProfileName(updateProfileRequest.getUsername());
+            }
+        }
 
         if (updateProfileRequest.getEmail() != null && !updateProfileRequest.getEmail().isEmpty()) {
             user.setEmail(updateProfileRequest.getEmail());
         }
 
-
         if (updateProfileRequest.getNewPassword() != null && !updateProfileRequest.getNewPassword().isEmpty()) {
             user.setPassword(passwordEncoder.encode(updateProfileRequest.getNewPassword()));
         }
 
-        return userRepository.save(user);
+        if (updateProfileRequest.getProfilePicture() != null && !updateProfileRequest.getProfilePicture().isEmpty()) {
+            user.setProfilePicture(updateProfileRequest.getProfilePicture());
+        }
+
+        if (updateProfileRequest.getProfileName() != null && !updateProfileRequest.getProfileName().isEmpty()) {
+            user.setProfileName(updateProfileRequest.getProfileName());
+        }
+
+        try {
+            return userRepository.save(user);
+        } catch (DataIntegrityViolationException e) {
+            String constraintName = e.getMostSpecificCause().getMessage();
+            if (constraintName.contains("users_username_key")) {
+                return user;
+            }
+            throw e;
+        }
     }
 
     public UserProfileResponse getUserProfile(Principal principal) {
+        if (principal == null) {
+            throw new IllegalArgumentException("Principal is null");
+        }
+
         User user = userRepository.findByUsername(principal.getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-
-        return new UserProfileResponse(user.getUsername(), user.getEmail(), user.getProfilePicture(), user.getAmountOfScripts());
+        return new UserProfileResponse(user.getUsername(), user.getProfileName(), user.getEmail(), user.getProfilePicture(), user.getAmountOfScripts());
     }
 }
-

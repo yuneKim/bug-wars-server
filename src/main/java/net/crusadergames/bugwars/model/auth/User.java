@@ -48,6 +48,9 @@ public class User {
     @Size(max = 255)
     private String profilePicture;
 
+    @Size(min = 3, max = 50)
+    private String profileName;
+
     @JsonIgnore
     public int getAmountOfScripts() {
         return scripts != null ? scripts.size() : 0;
