@@ -186,7 +186,7 @@ public class AuthServiceTests {
 
 //    @Test
 //    public void updateUserProfile_returnsUser() {
-//        UpdateProfileRequest updateProfileRequest = new UpdateProfileRequest("test_user", "test@gmail.com", "password111");
+//        UpdateProfileRequest updateProfileRequest = new UpdateProfileRequest("test_user", "testuser", "test@gmail.com", "password111", "password111", "1");
 //        User user = new User(updateProfileRequest.getUsername(), updateProfileRequest.getEmail(), updateProfileRequest.getNewPassword());
 //        when(userRepository.existsByUsernameIgnoreCase(Mockito.any())).thenReturn(false);
 //        when(userRepository.existsByEmailIgnoreCase(Mockito.any())).thenReturn(false);
@@ -200,7 +200,7 @@ public class AuthServiceTests {
 
 //    @Test
 //    public void updateUserProfile_respondsWithErrorMessageOnInappropriateUsername() {
-//        UpdateProfileRequest updateProfileRequest = new UpdateProfileRequest("fuck asdfa", "test@gmail.com", "password111");
+//        UpdateProfileRequest updateProfileRequest = new UpdateProfileRequest("fuck asdfa", "testuser","test@gmail.com", "password111", "password111", "1");
 //        when(userRepository.existsByEmailIgnoreCase(Mockito.any())).thenReturn(false);
 //
 //        Assertions.assertThatThrownBy(() -> authService.updateUserProfile(updateProfileRequest))
@@ -210,7 +210,7 @@ public class AuthServiceTests {
 
 //    @Test
 //    public void getUserProfile_returnsUser() {
-//        UserProfileResponse userProfileResponse = new UserProfileResponse("test_user", "test@gmail.com", "1", 1);
+//        UserProfileResponse userProfileResponse = new UserProfileResponse("test_user", "testuser", "test@gmail.com", "1", 1);
 //        User user = new User(userProfileResponse.getUsername(), userProfileResponse.getEmail(), userProfileResponse.getProfilePicture());
 //        when(userRepository.existsByUsernameIgnoreCase(Mockito.any())).thenReturn(false);
 //        when(userRepository.existsByEmailIgnoreCase(Mockito.any())).thenReturn(false);

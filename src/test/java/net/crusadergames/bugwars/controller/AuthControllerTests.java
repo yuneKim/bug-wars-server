@@ -94,7 +94,7 @@ public class AuthControllerTests {
     }
 //    @Test
 //    public void updateProfile_returnsUser() throws Exception {
-//        UpdateProfileRequest updateProfileRequest = new UpdateProfileRequest("test_user", "test@gmail.com", "password111");
+//        UpdateProfileRequest updateProfileRequest = new UpdateProfileRequest("test_user", "testuser", "test@gmail.com", "password111", "password111", "1");
 //        User user = new User(updateProfileRequest.getUsername(), updateProfileRequest.getEmail(), updateProfileRequest.getNewPassword());
 //        when(authService.updateUserProfile(ArgumentMatchers.any())).thenReturn(user);
 //
@@ -109,7 +109,7 @@ public class AuthControllerTests {
 
     @Test
     public void getUserProfile_returnsUser() throws Exception {
-        UserProfileResponse userProfileResponse = new UserProfileResponse("test_user", "test@gmail.com", "1", 1);
+        UserProfileResponse userProfileResponse = new UserProfileResponse("test_user", "testuser","test@gmail.com", "1", 1);
         User user = new User(userProfileResponse.getUsername(), userProfileResponse.getEmail(), userProfileResponse.getProfilePicture());
         when(authService.getUserProfile(ArgumentMatchers.any())).thenReturn(userProfileResponse);
 
