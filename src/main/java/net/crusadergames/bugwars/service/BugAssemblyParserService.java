@@ -13,17 +13,16 @@ import java.util.List;
 
 @Service
 public class BugAssemblyParserService {
-    @Autowired
-    BugAssemblyParserFactory bugAssemblyParserFactory;
 
-    public List<Integer> parse(BugAssemblyParseRequest bugAssemblyParseRequest) {
+    private final BugAssemblyParserFactory bugAssemblyParserFactory;
+
+    public BugAssemblyParserService(BugAssemblyParserFactory bugAssemblyParserFactory) {
+        this.bugAssemblyParserFactory = bugAssemblyParserFactory;
+    }
+
+    public List<Integer> parse(BugAssemblyParseRequest bugAssemblyParseRequest) throws BugAssemblyParseException {
         BugAssemblyParser parser = bugAssemblyParserFactory.createInstance();
 
-        try {
-            return parser.parse(bugAssemblyParseRequest.getCode());
-        } catch (BugAssemblyParseException e) {
-            // 422 response
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, e.getMessage());
-        }
+        return parser.parse(bugAssemblyParseRequest.getCode());
     }
 }

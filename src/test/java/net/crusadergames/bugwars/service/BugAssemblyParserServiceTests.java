@@ -5,10 +5,12 @@ import net.crusadergames.bugwars.parser.BugAssemblyParseException;
 import net.crusadergames.bugwars.parser.BugAssemblyParser;
 import net.crusadergames.bugwars.parser.BugAssemblyParserFactory;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,13 +20,14 @@ import java.util.List;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
 public class BugAssemblyParserServiceTests {
-    @Mock
-    private BugAssemblyParserFactory bugAssemblyParserFactory;
-
-    @InjectMocks
+    private final BugAssemblyParserFactory bugAssemblyParserFactory = Mockito.mock(BugAssemblyParserFactory.class);
     private BugAssemblyParserService bugAssemblyParserService;
+
+    @BeforeEach
+    public void setup() {
+        bugAssemblyParserService = new BugAssemblyParserService(bugAssemblyParserFactory);
+    }
 
     @Test
     public void parse_returnsBytecode() throws BugAssemblyParseException {
@@ -41,7 +44,7 @@ public class BugAssemblyParserServiceTests {
     }
 
     @Test
-    public void parse_respondsWithUnprocessableEntityOnParseException() throws BugAssemblyParseException {
+    public void parse_throwsBugAssemblyParseExceptionOnParseException() throws BugAssemblyParseException {
         BugAssemblyParseRequest bugAssemblyParseRequest = new BugAssemblyParseRequest("  rotr something\n");
 
         BugAssemblyParser bugAssemblyParser = mock(BugAssemblyParser.class);
@@ -49,7 +52,6 @@ public class BugAssemblyParserServiceTests {
         when(bugAssemblyParser.parse(bugAssemblyParseRequest.getCode())).thenThrow(BugAssemblyParseException.class);
 
         Assertions.assertThatThrownBy(() -> bugAssemblyParserService.parse(bugAssemblyParseRequest))
-                .isInstanceOf(ResponseStatusException.class)
-                .hasFieldOrPropertyWithValue("status", HttpStatus.UNPROCESSABLE_ENTITY);
+                .isInstanceOf(BugAssemblyParseException.class);
     }
 }

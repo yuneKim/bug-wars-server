@@ -2,6 +2,7 @@ package net.crusadergames.bugwars.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.crusadergames.bugwars.dto.request.BugAssemblyParseRequest;
+import net.crusadergames.bugwars.parser.BugAssemblyParseException;
 import net.crusadergames.bugwars.service.BugAssemblyParserService;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
@@ -50,5 +51,17 @@ public class BugAssemblyParserControllerTests {
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0]", CoreMatchers.is(35)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[1]", CoreMatchers.is(0)));
 
+    }
+
+    @Test
+    public void parse_respondsWithUnprocessableEntityIfInvalidBytecode() throws Exception {
+        BugAssemblyParseRequest bugAssemblyParseRequest = new BugAssemblyParseRequest(":START\ngoto");
+        when(bugAssemblyParserService.parse(ArgumentMatchers.any())).thenThrow(BugAssemblyParseException.class);
+
+        ResultActions response = mockMvc.perform(post("/api/parse")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(bugAssemblyParseRequest)));
+
+        response.andExpect(MockMvcResultMatchers.status().isUnprocessableEntity());
     }
 }
