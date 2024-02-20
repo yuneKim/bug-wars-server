@@ -3,49 +3,46 @@ package net.crusadergames.bugwars.service;
 import net.crusadergames.bugwars.config.Maps;
 import net.crusadergames.bugwars.dto.request.PlayGameDTO;
 import net.crusadergames.bugwars.dto.response.GameReplayDTO;
-import net.crusadergames.bugwars.dto.response.GameMapDTO;
+import net.crusadergames.bugwars.exception.ResourceNotFoundException;
 import net.crusadergames.bugwars.game.Game;
 import net.crusadergames.bugwars.game.Swarm;
 import net.crusadergames.bugwars.game.entity.Entity;
 import net.crusadergames.bugwars.game.setup.GameFactory;
+import net.crusadergames.bugwars.model.GameMap;
 import net.crusadergames.bugwars.model.Script;
 import net.crusadergames.bugwars.model.auth.User;
 import net.crusadergames.bugwars.repository.ScriptRepository;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
 public class GameServiceTests {
-    @Mock
     private GameFactory gameFactory;
-
-    @Mock
     private ScriptRepository scriptRepository;
-
-    @InjectMocks
     private GameService gameService;
+
+    @BeforeEach
+    public void setup() {
+        gameFactory = Mockito.mock(GameFactory.class);
+        scriptRepository = Mockito.mock(ScriptRepository.class);
+        gameService = new GameService(gameFactory, scriptRepository);
+    }
 
     @Test
     public void getAllMaps_returnsAllMaps() {
-        List<GameMapDTO> gameMaps = gameService.getAllMaps();
+        List<GameMap> gameMaps = gameService.getAllMaps();
 
         Assertions.assertThat(gameMaps.size()).isGreaterThan(0);
     }
 
     @Test
-    public void playGame_returnsGameReplay() {
+    public void playGame_returnsGameReplay() throws ResourceNotFoundException {
         String mapName = "ns_faceoff.txt";
         PlayGameDTO playGameDTO = new PlayGameDTO(List.of(1L, 2L), 1);
 
@@ -64,7 +61,7 @@ public class GameServiceTests {
         when(gameFactory.createInstance(mapName, swarms)).thenReturn(game);
         when(game.play()).thenReturn(new GameReplayDTO(null, new Entity[][]{}, null));
 
-        GameReplayDTO replay = gameService.playGame(playGameDTO);
+        GameReplayDTO replay = gameService.playGame(playGameDTO.getScriptIds(), playGameDTO.getMapId());
 
         Assertions.assertThat(replay).isNotNull();
     }
@@ -73,15 +70,15 @@ public class GameServiceTests {
     public void playGame_throwsHttpStatusExceptionOnInvalidMap() {
         PlayGameDTO playGameDTO = new PlayGameDTO(List.of(1L, 2L), -1);
 
-        Assertions.assertThatThrownBy(() -> gameService.playGame(playGameDTO))
-                .isInstanceOf(ResponseStatusException.class)
-                .hasFieldOrPropertyWithValue("status", HttpStatus.NOT_FOUND);
+        Assertions.assertThatThrownBy(() -> gameService.playGame(playGameDTO.getScriptIds(), playGameDTO.getMapId()))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("Map not found.");
 
         PlayGameDTO playGameDTO2 = new PlayGameDTO(List.of(1L, 2L), Maps.getMaps().size() + 1);
 
-        Assertions.assertThatThrownBy(() -> gameService.playGame(playGameDTO2))
-                .isInstanceOf(ResponseStatusException.class)
-                .hasFieldOrPropertyWithValue("status", HttpStatus.NOT_FOUND);
+        Assertions.assertThatThrownBy(() -> gameService.playGame(playGameDTO2.getScriptIds(), playGameDTO2.getMapId()))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("Map not found.");
     }
 
     @Test
@@ -94,8 +91,8 @@ public class GameServiceTests {
         when(scriptRepository.findById(1L)).thenReturn(Optional.of(script1));
         when(scriptRepository.findById(2L)).thenReturn(Optional.empty());
 
-        Assertions.assertThatThrownBy(() -> gameService.playGame(playGameDTO))
-                .isInstanceOf(ResponseStatusException.class)
-                .hasFieldOrPropertyWithValue("status", HttpStatus.UNPROCESSABLE_ENTITY);
+        Assertions.assertThatThrownBy(() -> gameService.playGame(playGameDTO.getScriptIds(), playGameDTO.getMapId()))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("Invalid Script.");
     }
 }

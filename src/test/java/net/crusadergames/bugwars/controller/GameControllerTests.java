@@ -3,7 +3,7 @@ package net.crusadergames.bugwars.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.crusadergames.bugwars.dto.request.PlayGameDTO;
 import net.crusadergames.bugwars.dto.response.GameReplayDTO;
-import net.crusadergames.bugwars.dto.response.GameMapDTO;
+import net.crusadergames.bugwars.exception.ResourceNotFoundException;
 import net.crusadergames.bugwars.game.setup.GameFactory;
 import net.crusadergames.bugwars.service.GameService;
 import org.junit.jupiter.api.Test;
@@ -40,9 +40,6 @@ public class GameControllerTests {
 
     @Test
     public void getAllMaps_returnsAllMaps() throws Exception {
-        List<GameMapDTO> responseData = List.of(new GameMapDTO(1, "Test", "Testbase64", 4));
-        when(gameService.getAllMaps()).thenReturn(responseData);
-
         ResultActions response = mockMvc.perform(get("/api/game/maps"));
 
         response.andExpect(MockMvcResultMatchers.status().isOk());
@@ -52,7 +49,7 @@ public class GameControllerTests {
     public void playGame_returnsGameResponse() throws Exception {
         PlayGameDTO createPlayGameDTO = new PlayGameDTO(List.of(1L, 2L), 1);
         GameReplayDTO gameReplayDTO = Mockito.mock(GameReplayDTO.class);
-        when(gameService.playGame(Mockito.any())).thenReturn(gameReplayDTO);
+        when(gameService.playGame(Mockito.any(), Mockito.any())).thenReturn(gameReplayDTO);
 
 
         ResultActions response = mockMvc.perform(post("/api/game")
@@ -60,5 +57,29 @@ public class GameControllerTests {
                 .content(objectMapper.writeValueAsString(createPlayGameDTO)));
 
         response.andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    public void playGame_respondsWithNotFoundWhenMapNotFound() throws Exception {
+        PlayGameDTO createPlayGameDTO = new PlayGameDTO(List.of(1L, 2L), -1);
+        when(gameService.playGame(Mockito.any(), Mockito.any())).thenThrow(new ResourceNotFoundException("Map not found."));
+
+        ResultActions response = mockMvc.perform(post("/api/game")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(createPlayGameDTO)));
+
+        response.andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
+    @Test
+    public void playGame_respondsWithUnprocessableEntityWhenScriptInvalid() throws Exception {
+        PlayGameDTO createPlayGameDTO = new PlayGameDTO(List.of(1L, 2L), 1);
+        when(gameService.playGame(Mockito.any(), Mockito.any())).thenThrow(new ResourceNotFoundException("Invalid Script."));
+
+        ResultActions response = mockMvc.perform(post("/api/game")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(createPlayGameDTO)));
+
+        response.andExpect(MockMvcResultMatchers.status().isUnprocessableEntity());
     }
 }

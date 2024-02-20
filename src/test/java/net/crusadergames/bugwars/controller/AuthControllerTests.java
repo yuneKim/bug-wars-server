@@ -7,7 +7,7 @@ import net.crusadergames.bugwars.dto.request.TokenRefreshRequestDTO;
 import net.crusadergames.bugwars.dto.response.JwtDTO;
 import net.crusadergames.bugwars.dto.response.TokenRefreshResponseDTO;
 import net.crusadergames.bugwars.exception.RefreshTokenException;
-import net.crusadergames.bugwars.exception.UserNotFoundException;
+import net.crusadergames.bugwars.exception.ResourceNotFoundException;
 import net.crusadergames.bugwars.model.auth.User;
 import net.crusadergames.bugwars.service.AuthService;
 import org.hamcrest.CoreMatchers;
@@ -30,7 +30,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.security.Principal;
 import java.util.List;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @WebMvcTest(controllers = AuthController.class)
@@ -126,7 +127,7 @@ public class AuthControllerTests {
     public void logout_respondsWithInternalServerErrorWhenUserNotFound() throws Exception {
         Principal mockPrincipal = Mockito.mock(Principal.class);
         Mockito.when(mockPrincipal.getName()).thenReturn("Fred");
-        doThrow(UserNotFoundException.class).when(authService).logout(ArgumentMatchers.anyString());
+        doThrow(ResourceNotFoundException.class).when(authService).logout(ArgumentMatchers.anyString());
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/api/auth/logout")

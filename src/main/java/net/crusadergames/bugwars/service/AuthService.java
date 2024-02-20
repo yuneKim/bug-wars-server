@@ -5,7 +5,7 @@ import net.crusadergames.bugwars.dto.request.SignupDTO;
 import net.crusadergames.bugwars.dto.response.JwtDTO;
 import net.crusadergames.bugwars.dto.response.TokenRefreshResponseDTO;
 import net.crusadergames.bugwars.exception.RefreshTokenException;
-import net.crusadergames.bugwars.exception.UserNotFoundException;
+import net.crusadergames.bugwars.exception.ResourceNotFoundException;
 import net.crusadergames.bugwars.model.auth.ERole;
 import net.crusadergames.bugwars.model.auth.RefreshToken;
 import net.crusadergames.bugwars.model.auth.Role;
@@ -104,8 +104,10 @@ public class AuthService {
         return new TokenRefreshResponseDTO(token, requestRefreshToken);
     }
 
-    public void logout(String username) throws UserNotFoundException {
-        User user = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
+    public void logout(String username) throws ResourceNotFoundException {
+        User user = userRepository
+                .findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found."));
         refreshTokenService.deleteByUserId(user.getId());
     }
 }

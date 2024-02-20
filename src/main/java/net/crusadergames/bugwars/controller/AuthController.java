@@ -7,7 +7,7 @@ import net.crusadergames.bugwars.dto.request.TokenRefreshRequestDTO;
 import net.crusadergames.bugwars.dto.response.JwtDTO;
 import net.crusadergames.bugwars.dto.response.TokenRefreshResponseDTO;
 import net.crusadergames.bugwars.exception.RefreshTokenException;
-import net.crusadergames.bugwars.exception.UserNotFoundException;
+import net.crusadergames.bugwars.exception.ResourceNotFoundException;
 import net.crusadergames.bugwars.model.auth.User;
 import net.crusadergames.bugwars.service.AuthService;
 import org.springframework.http.HttpStatus;
@@ -53,7 +53,7 @@ public class AuthController {
 
         try {
             authService.logout(principal.getName());
-        } catch (UserNotFoundException e) {
+        } catch (ResourceNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }

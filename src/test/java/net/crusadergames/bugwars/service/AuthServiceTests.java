@@ -4,7 +4,7 @@ import net.crusadergames.bugwars.dto.request.LoginDTO;
 import net.crusadergames.bugwars.dto.request.SignupDTO;
 import net.crusadergames.bugwars.dto.response.JwtDTO;
 import net.crusadergames.bugwars.exception.RefreshTokenException;
-import net.crusadergames.bugwars.exception.UserNotFoundException;
+import net.crusadergames.bugwars.exception.ResourceNotFoundException;
 import net.crusadergames.bugwars.model.auth.ERole;
 import net.crusadergames.bugwars.model.auth.RefreshToken;
 import net.crusadergames.bugwars.model.auth.Role;
@@ -146,7 +146,7 @@ public class AuthServiceTests {
     }
 
     @Test
-    public void logout_deletesRefreshToken() throws UserNotFoundException {
+    public void logout_deletesRefreshToken() throws ResourceNotFoundException {
         User mockUser = new User();
         mockUser.setId(5L);
         when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.of(mockUser));
@@ -159,7 +159,7 @@ public class AuthServiceTests {
         when(userRepository.findByUsername("Fred")).thenReturn(Optional.empty());
 
         Assertions.assertThatThrownBy(() -> authService.logout("Fred"))
-                .isInstanceOf(UserNotFoundException.class);
+                .isInstanceOf(ResourceNotFoundException.class);
     }
 
 }
