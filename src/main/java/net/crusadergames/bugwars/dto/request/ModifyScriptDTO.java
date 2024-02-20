@@ -6,9 +6,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class TokenRefreshRequest {
+@AllArgsConstructor
+public class ModifyScriptDTO {
+
     @NotBlank
-    private String refreshToken;
+    private String name;
+
+    @NotBlank
+    private String raw;
 }

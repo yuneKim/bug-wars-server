@@ -1,6 +1,6 @@
 package net.crusadergames.bugwars.game;
 
-import net.crusadergames.bugwars.dto.response.GameReplay;
+import net.crusadergames.bugwars.dto.response.GameReplayDTO;
 import net.crusadergames.bugwars.game.entity.Entity;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -34,8 +34,8 @@ public class GameTests {
         when(battleground.getGrid()).thenReturn(new Entity[][]{});
         when(battleground.nextTick()).thenReturn(new TickSummary());
         Game game = new Game(battleground, swarms, 100);
-        GameReplay gameReplay = game.play();
-        Assertions.assertThat(gameReplay).isNotNull();
+        GameReplayDTO gameReplayDTO = game.play();
+        Assertions.assertThat(gameReplayDTO).isNotNull();
         Mockito.verify(battleground, times(100)).nextTick();
     }
 
@@ -47,8 +47,8 @@ public class GameTests {
         when(battleground.getGrid()).thenReturn(new Entity[][]{});
         when(battleground.nextTick()).thenReturn(new TickSummary(List.of(), true));
         Game game = new Game(battleground, swarms, 100);
-        GameReplay gameReplay = game.play();
-        Assertions.assertThat(gameReplay).isNotNull();
+        GameReplayDTO gameReplayDTO = game.play();
+        Assertions.assertThat(gameReplayDTO).isNotNull();
         Mockito.verify(battleground, times(1)).nextTick();
     }
 }

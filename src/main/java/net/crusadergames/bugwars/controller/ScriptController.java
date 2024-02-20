@@ -1,7 +1,7 @@
 package net.crusadergames.bugwars.controller;
 
-import net.crusadergames.bugwars.dto.request.ModifyScriptRequest;
-import net.crusadergames.bugwars.dto.response.ScriptName;
+import net.crusadergames.bugwars.dto.request.ModifyScriptDTO;
+import net.crusadergames.bugwars.dto.response.ScriptNameDTO;
 import net.crusadergames.bugwars.model.Script;
 import net.crusadergames.bugwars.service.ScriptService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ public class ScriptController {
 
     @GetMapping("/all")
     @PreAuthorize("permitAll()")
-    public List<ScriptName> getAllNamesOfValidScripts() {
+    public List<ScriptNameDTO> getAllNamesOfValidScripts() {
         return scriptService.getAllNamesOfValidScripts();
     }
 
@@ -39,12 +39,12 @@ public class ScriptController {
 
     @PostMapping
     @ResponseStatus(value = HttpStatus.CREATED)
-    public Script createScript(@RequestBody ModifyScriptRequest request, Principal principal) {
+    public Script createScript(@RequestBody ModifyScriptDTO request, Principal principal) {
         return scriptService.createScript(request, principal);
     }
 
     @PutMapping(path = "/{scriptId}")
-    public Script updateScript(@PathVariable Long scriptId, Principal principal, @RequestBody ModifyScriptRequest request) {
+    public Script updateScript(@PathVariable Long scriptId, Principal principal, @RequestBody ModifyScriptDTO request) {
         return scriptService.updateScript(scriptId, principal, request);
     }
 

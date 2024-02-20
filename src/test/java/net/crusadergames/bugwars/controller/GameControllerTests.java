@@ -1,9 +1,9 @@
 package net.crusadergames.bugwars.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.crusadergames.bugwars.dto.request.GameRequest;
-import net.crusadergames.bugwars.dto.response.GameReplay;
-import net.crusadergames.bugwars.dto.response.ResponseGameMap;
+import net.crusadergames.bugwars.dto.request.PlayGameDTO;
+import net.crusadergames.bugwars.dto.response.GameReplayDTO;
+import net.crusadergames.bugwars.dto.response.GameMapDTO;
 import net.crusadergames.bugwars.game.setup.GameFactory;
 import net.crusadergames.bugwars.service.GameService;
 import org.junit.jupiter.api.Test;
@@ -40,7 +40,7 @@ public class GameControllerTests {
 
     @Test
     public void getAllMaps_returnsAllMaps() throws Exception {
-        List<ResponseGameMap> responseData = List.of(new ResponseGameMap(1, "Test", "Testbase64", 4));
+        List<GameMapDTO> responseData = List.of(new GameMapDTO(1, "Test", "Testbase64", 4));
         when(gameService.getAllMaps()).thenReturn(responseData);
 
         ResultActions response = mockMvc.perform(get("/api/game/maps"));
@@ -50,14 +50,14 @@ public class GameControllerTests {
 
     @Test
     public void playGame_returnsGameResponse() throws Exception {
-        GameRequest createGameRequest = new GameRequest(List.of(1L, 2L), 1);
-        GameReplay gameReplay = Mockito.mock(GameReplay.class);
-        when(gameService.playGame(Mockito.any())).thenReturn(gameReplay);
+        PlayGameDTO createPlayGameDTO = new PlayGameDTO(List.of(1L, 2L), 1);
+        GameReplayDTO gameReplayDTO = Mockito.mock(GameReplayDTO.class);
+        when(gameService.playGame(Mockito.any())).thenReturn(gameReplayDTO);
 
 
         ResultActions response = mockMvc.perform(post("/api/game")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createGameRequest)));
+                .content(objectMapper.writeValueAsString(createPlayGameDTO)));
 
         response.andExpect(MockMvcResultMatchers.status().isOk());
     }

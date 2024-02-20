@@ -1,9 +1,9 @@
 package net.crusadergames.bugwars.service;
 
 import net.crusadergames.bugwars.config.Maps;
-import net.crusadergames.bugwars.dto.request.GameRequest;
-import net.crusadergames.bugwars.dto.response.GameReplay;
-import net.crusadergames.bugwars.dto.response.ResponseGameMap;
+import net.crusadergames.bugwars.dto.request.PlayGameDTO;
+import net.crusadergames.bugwars.dto.response.GameReplayDTO;
+import net.crusadergames.bugwars.dto.response.GameMapDTO;
 import net.crusadergames.bugwars.game.Game;
 import net.crusadergames.bugwars.game.Swarm;
 import net.crusadergames.bugwars.game.entity.Entity;
@@ -39,7 +39,7 @@ public class GameServiceTests {
 
     @Test
     public void getAllMaps_returnsAllMaps() {
-        List<ResponseGameMap> gameMaps = gameService.getAllMaps();
+        List<GameMapDTO> gameMaps = gameService.getAllMaps();
 
         Assertions.assertThat(gameMaps.size()).isGreaterThan(0);
     }
@@ -47,7 +47,7 @@ public class GameServiceTests {
     @Test
     public void playGame_returnsGameReplay() {
         String mapName = "ns_faceoff.txt";
-        GameRequest gameRequest = new GameRequest(List.of(1L, 2L), 1);
+        PlayGameDTO playGameDTO = new PlayGameDTO(List.of(1L, 2L), 1);
 
         Script script1 = new Script(1L, "Test1", "[13]");
         script1.setUser(new User("User1", "user@user.com", "password"));
@@ -62,31 +62,31 @@ public class GameServiceTests {
         when(scriptRepository.findById(1L)).thenReturn(Optional.of(script1));
         when(scriptRepository.findById(2L)).thenReturn(Optional.of(script2));
         when(gameFactory.createInstance(mapName, swarms)).thenReturn(game);
-        when(game.play()).thenReturn(new GameReplay(null, new Entity[][]{}, null));
+        when(game.play()).thenReturn(new GameReplayDTO(null, new Entity[][]{}, null));
 
-        GameReplay replay = gameService.playGame(gameRequest);
+        GameReplayDTO replay = gameService.playGame(playGameDTO);
 
         Assertions.assertThat(replay).isNotNull();
     }
 
     @Test
     public void playGame_throwsHttpStatusExceptionOnInvalidMap() {
-        GameRequest gameRequest = new GameRequest(List.of(1L, 2L), -1);
+        PlayGameDTO playGameDTO = new PlayGameDTO(List.of(1L, 2L), -1);
 
-        Assertions.assertThatThrownBy(() -> gameService.playGame(gameRequest))
+        Assertions.assertThatThrownBy(() -> gameService.playGame(playGameDTO))
                 .isInstanceOf(ResponseStatusException.class)
                 .hasFieldOrPropertyWithValue("status", HttpStatus.NOT_FOUND);
 
-        GameRequest gameRequest2 = new GameRequest(List.of(1L, 2L), Maps.getMaps().size() + 1);
+        PlayGameDTO playGameDTO2 = new PlayGameDTO(List.of(1L, 2L), Maps.getMaps().size() + 1);
 
-        Assertions.assertThatThrownBy(() -> gameService.playGame(gameRequest2))
+        Assertions.assertThatThrownBy(() -> gameService.playGame(playGameDTO2))
                 .isInstanceOf(ResponseStatusException.class)
                 .hasFieldOrPropertyWithValue("status", HttpStatus.NOT_FOUND);
     }
 
     @Test
     public void playGame_throwsHttpStatusExceptionOnInvalidScript() {
-        GameRequest gameRequest = new GameRequest(List.of(1L, 2L), 1);
+        PlayGameDTO playGameDTO = new PlayGameDTO(List.of(1L, 2L), 1);
 
         Script script1 = new Script(1L, "Test1", "[13]");
         script1.setUser(new User("User1", "user@user.com", "password"));
@@ -94,7 +94,7 @@ public class GameServiceTests {
         when(scriptRepository.findById(1L)).thenReturn(Optional.of(script1));
         when(scriptRepository.findById(2L)).thenReturn(Optional.empty());
 
-        Assertions.assertThatThrownBy(() -> gameService.playGame(gameRequest))
+        Assertions.assertThatThrownBy(() -> gameService.playGame(playGameDTO))
                 .isInstanceOf(ResponseStatusException.class)
                 .hasFieldOrPropertyWithValue("status", HttpStatus.UNPROCESSABLE_ENTITY);
     }

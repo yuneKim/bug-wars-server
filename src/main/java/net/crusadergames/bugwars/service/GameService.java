@@ -1,9 +1,9 @@
 package net.crusadergames.bugwars.service;
 
 import net.crusadergames.bugwars.config.Maps;
-import net.crusadergames.bugwars.dto.request.GameRequest;
-import net.crusadergames.bugwars.dto.response.GameReplay;
-import net.crusadergames.bugwars.dto.response.ResponseGameMap;
+import net.crusadergames.bugwars.dto.request.PlayGameDTO;
+import net.crusadergames.bugwars.dto.response.GameReplayDTO;
+import net.crusadergames.bugwars.dto.response.GameMapDTO;
 import net.crusadergames.bugwars.game.Game;
 import net.crusadergames.bugwars.game.Swarm;
 import net.crusadergames.bugwars.game.setup.GameFactory;
@@ -27,13 +27,13 @@ public class GameService {
     ScriptRepository scriptRepository;
 
 
-    public List<ResponseGameMap> getAllMaps() {
-        List<ResponseGameMap> maps = new ArrayList<>();
+    public List<GameMapDTO> getAllMaps() {
+        List<GameMapDTO> maps = new ArrayList<>();
 
         for (int i = 0; i < Maps.getMaps().size(); i++) {
             GameMap map = Maps.getMaps().get(i);
             maps.add(
-                    new ResponseGameMap(
+                    new GameMapDTO(
                             i,
                             map.getName(),
                             map.getPreviewImgUrl(),
@@ -45,12 +45,12 @@ public class GameService {
         return maps;
     }
 
-    public GameReplay playGame(GameRequest gameRequest) {
-        if (gameRequest.getMapId() > Maps.getMaps().size() || gameRequest.getMapId() < 0) {
+    public GameReplayDTO playGame(PlayGameDTO playGameDTO) {
+        if (playGameDTO.getMapId() > Maps.getMaps().size() || playGameDTO.getMapId() < 0) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Map not found.");
         }
-        GameMap map = Maps.getMaps().get(gameRequest.getMapId());
-        List<Swarm> swarms = createSwarms(gameRequest.getScriptIds().stream().limit(map.getSwarms()).toList());
+        GameMap map = Maps.getMaps().get(playGameDTO.getMapId());
+        List<Swarm> swarms = createSwarms(playGameDTO.getScriptIds().stream().limit(map.getSwarms()).toList());
 
         Game game = gameFactory.createInstance(map.getFileName(), swarms);
         return game.play();

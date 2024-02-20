@@ -1,8 +1,8 @@
 package net.crusadergames.bugwars.controller;
 
-import net.crusadergames.bugwars.dto.request.GameRequest;
-import net.crusadergames.bugwars.dto.response.GameReplay;
-import net.crusadergames.bugwars.dto.response.ResponseGameMap;
+import net.crusadergames.bugwars.dto.request.PlayGameDTO;
+import net.crusadergames.bugwars.dto.response.GameReplayDTO;
+import net.crusadergames.bugwars.dto.response.GameMapDTO;
 import net.crusadergames.bugwars.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,12 +17,12 @@ public class GameController {
     GameService gameService;
 
     @GetMapping("/maps")
-    public List<ResponseGameMap> getAllMaps() {
+    public List<GameMapDTO> getAllMaps() {
         return gameService.getAllMaps();
     }
 
     @PostMapping
-    public GameReplay playGame(@RequestBody GameRequest gameRequest) {
-        return gameService.playGame(gameRequest);
+    public GameReplayDTO playGame(@RequestBody PlayGameDTO playGameDTO) {
+        return gameService.playGame(playGameDTO);
     }
 }

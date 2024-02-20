@@ -1,8 +1,8 @@
 package net.crusadergames.bugwars.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.crusadergames.bugwars.dto.request.ModifyScriptRequest;
-import net.crusadergames.bugwars.dto.response.ScriptName;
+import net.crusadergames.bugwars.dto.request.ModifyScriptDTO;
+import net.crusadergames.bugwars.dto.response.ScriptNameDTO;
 import net.crusadergames.bugwars.model.Script;
 import net.crusadergames.bugwars.model.auth.User;
 import net.crusadergames.bugwars.service.ScriptService;
@@ -47,7 +47,7 @@ public class ScriptControllerTests {
     @Test
     public void getAllNamesOfValidScripts_returnsValidScriptNames() throws Exception {
         when(scriptService.getAllNamesOfValidScripts()).thenReturn(
-                List.of(new ScriptName(1L, "Test1", "User1"), new ScriptName(2L, "Test2", "User2"))
+                List.of(new ScriptNameDTO(1L, "Test1", "User1"), new ScriptNameDTO(2L, "Test2", "User2"))
         );
 
         ResultActions response = mockMvc.perform(get("/api/scripts/all"));
@@ -86,13 +86,13 @@ public class ScriptControllerTests {
 
     @Test
     public void createScript_returnsScript() throws Exception {
-        ModifyScriptRequest modifyScriptRequest = new ModifyScriptRequest("The Ol' Razzle Dazzle", ":START dance");
+        ModifyScriptDTO modifyScriptDTO = new ModifyScriptDTO("The Ol' Razzle Dazzle", ":START dance");
         when(scriptService.createScript(Mockito.any(), Mockito.any()))
                 .thenReturn(SCRIPT_1);
 
         ResultActions response = mockMvc.perform(post("/api/scripts")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(modifyScriptRequest)));
+                .content(objectMapper.writeValueAsString(modifyScriptDTO)));
 
         response.andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(SCRIPT_1.getName())));
@@ -101,13 +101,13 @@ public class ScriptControllerTests {
 
     @Test
     public void updateScript_returnsScript() throws Exception {
-        ModifyScriptRequest modifyScriptRequest = new ModifyScriptRequest("The Ol' Razzle Dazzle", ":START dance");
+        ModifyScriptDTO modifyScriptDTO = new ModifyScriptDTO("The Ol' Razzle Dazzle", ":START dance");
         when(scriptService.updateScript(Mockito.anyLong(), Mockito.any(), Mockito.any()))
                 .thenReturn(SCRIPT_1);
 
         ResultActions response = mockMvc.perform(put("/api/scripts/1")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(modifyScriptRequest)));
+                .content(objectMapper.writeValueAsString(modifyScriptDTO)));
 
         response.andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name", CoreMatchers.is(SCRIPT_1.getName())));

@@ -1,8 +1,8 @@
 package net.crusadergames.bugwars.service;
 
 import com.modernmt.text.profanity.ProfanityFilter;
-import net.crusadergames.bugwars.dto.request.ModifyScriptRequest;
-import net.crusadergames.bugwars.dto.response.ScriptName;
+import net.crusadergames.bugwars.dto.request.ModifyScriptDTO;
+import net.crusadergames.bugwars.dto.response.ScriptNameDTO;
 import net.crusadergames.bugwars.model.Script;
 import net.crusadergames.bugwars.model.auth.User;
 import net.crusadergames.bugwars.parser.BugAssemblyParseException;
@@ -33,10 +33,10 @@ public class ScriptService {
     @Autowired
     BugAssemblyParserFactory bugAssemblyParserFactory;
 
-    public List<ScriptName> getAllNamesOfValidScripts() {
+    public List<ScriptNameDTO> getAllNamesOfValidScripts() {
         return scriptRepository.findByIsBytecodeValidTrue()
                 .stream()
-                .map((script) -> new ScriptName(script.getId(), script.getName(), script.getUser().getUsername()))
+                .map((script) -> new ScriptNameDTO(script.getId(), script.getName(), script.getUser().getUsername()))
                 .toList();
     }
 
@@ -60,7 +60,7 @@ public class ScriptService {
         return script;
     }
 
-    public Script createScript(ModifyScriptRequest request, Principal principal) {
+    public Script createScript(ModifyScriptDTO request, Principal principal) {
         Script script = new Script();
         User user = getUser(principal);
         BugAssemblyParser parser = bugAssemblyParserFactory.createInstance();
@@ -91,7 +91,7 @@ public class ScriptService {
         return scriptRepository.save(script);
     }
 
-    public Script updateScript(long scriptId, Principal principal, ModifyScriptRequest request) {
+    public Script updateScript(long scriptId, Principal principal, ModifyScriptDTO request) {
         User user = getUser(principal);
         Optional<Script> existingScript = scriptRepository.findById(scriptId);
         BugAssemblyParser parser = bugAssemblyParserFactory.createInstance();

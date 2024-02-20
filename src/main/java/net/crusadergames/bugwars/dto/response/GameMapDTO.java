@@ -7,8 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ScriptName {
-    private Long id;
+public class GameMapDTO {
+    private Integer id;
     private String name;
-    private String author;
+    private String previewImgUrl;
+    private Integer swarms;
 }

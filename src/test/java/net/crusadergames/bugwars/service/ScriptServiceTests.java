@@ -1,8 +1,7 @@
 package net.crusadergames.bugwars.service;
 
-import com.modernmt.text.profanity.ProfanityFilter;
-import net.crusadergames.bugwars.dto.request.ModifyScriptRequest;
-import net.crusadergames.bugwars.dto.response.ScriptName;
+import net.crusadergames.bugwars.dto.request.ModifyScriptDTO;
+import net.crusadergames.bugwars.dto.response.ScriptNameDTO;
 import net.crusadergames.bugwars.model.Script;
 import net.crusadergames.bugwars.model.auth.User;
 import net.crusadergames.bugwars.parser.BugAssemblyParseException;
@@ -54,7 +53,7 @@ public class ScriptServiceTests {
                 SCRIPT_2
         ));
 
-        List<ScriptName> scripts = scriptService.getAllNamesOfValidScripts();
+        List<ScriptNameDTO> scripts = scriptService.getAllNamesOfValidScripts();
 
         Assertions.assertThat(scripts).hasSize(2);
     }
@@ -121,7 +120,7 @@ public class ScriptServiceTests {
 
     @Test
     public void createScript_respondsWithConflictStatusOnDuplicateName() {
-        ModifyScriptRequest request = new ModifyScriptRequest("Highway Robbery", ":START\ngoto START");
+        ModifyScriptDTO request = new ModifyScriptDTO("Highway Robbery", ":START\ngoto START");
 
 
         Principal mockPrincipal = Mockito.mock(Principal.class);
@@ -135,7 +134,7 @@ public class ScriptServiceTests {
 
     @Test
     public void createScript_respondsWithConflictStatusOnInappropriateName() {
-        ModifyScriptRequest request = new ModifyScriptRequest("Fucking Strawberries", ":START\ngoto START");
+        ModifyScriptDTO request = new ModifyScriptDTO("Fucking Strawberries", ":START\ngoto START");
 
         Principal mockPrincipal = Mockito.mock(Principal.class);
         when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.of(USER));
@@ -152,7 +151,7 @@ public class ScriptServiceTests {
         List<Integer> expectedResult = List.of(35, 0);
         Principal mockPrincipal = Mockito.mock(Principal.class);
         BugAssemblyParser bugAssemblyParser = mock(BugAssemblyParser.class);
-        ModifyScriptRequest request = new ModifyScriptRequest("Highway Robbery", ":START\ngoto START");
+        ModifyScriptDTO request = new ModifyScriptDTO("Highway Robbery", ":START\ngoto START");
 
 
         when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.of(USER));
@@ -169,7 +168,7 @@ public class ScriptServiceTests {
     @Test
     public void createScript_handlesInvalidByteCode() throws BugAssemblyParseException {
         Principal mockPrincipal = Mockito.mock(Principal.class);
-        ModifyScriptRequest request = new ModifyScriptRequest("Highway Robbery", ":START\ngoto START");
+        ModifyScriptDTO request = new ModifyScriptDTO("Highway Robbery", ":START\ngoto START");
         BugAssemblyParser bugAssemblyParser = mock(BugAssemblyParser.class);
         List<Integer> emptyList = new ArrayList<>();
         Script testScript = new Script(1L, new User(), "Highway Snobbery", ":START wiggle", "", false);
@@ -191,8 +190,8 @@ public class ScriptServiceTests {
         List<Integer> expectedResult = List.of(35, 0);
         Principal mockPrincipal = Mockito.mock(Principal.class);
         BugAssemblyParser bugAssemblyParser = mock(BugAssemblyParser.class);
-        ModifyScriptRequest request = new ModifyScriptRequest("Highway Robbery", ":START\ngoto START");
-        USER.setId(1l);
+        ModifyScriptDTO request = new ModifyScriptDTO("Highway Robbery", ":START\ngoto START");
+        USER.setId(1L);
         when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.of(USER));
         when(scriptRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(SCRIPT_1));
         when(bugAssemblyParserFactory.createInstance()).thenReturn(bugAssemblyParser);
@@ -209,8 +208,8 @@ public class ScriptServiceTests {
         List<Integer> expectedResult = List.of(35, 0);
         Principal mockPrincipal = Mockito.mock(Principal.class);
         BugAssemblyParser bugAssemblyParser = mock(BugAssemblyParser.class);
-        ModifyScriptRequest request = new ModifyScriptRequest("Highway Robbery", ":START\ngoto START");
-        USER.setId(1l);
+        ModifyScriptDTO request = new ModifyScriptDTO("Highway Robbery", ":START\ngoto START");
+        USER.setId(1L);
         when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.of(USER));
         when(scriptRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
 
@@ -224,10 +223,10 @@ public class ScriptServiceTests {
         List<Integer> expectedResult = List.of(35, 0);
         Principal mockPrincipal = Mockito.mock(Principal.class);
         BugAssemblyParser bugAssemblyParser = mock(BugAssemblyParser.class);
-        ModifyScriptRequest request = new ModifyScriptRequest("Highway Robbery", ":START\ngoto START");
+        ModifyScriptDTO request = new ModifyScriptDTO("Highway Robbery", ":START\ngoto START");
         User user = new User();
-        user.setId(1l);
-        USER.setId(2l);
+        user.setId(1L);
+        USER.setId(2L);
         when(mockPrincipal.getName()).thenReturn("Esteban");
         when(userRepository.findByUsername("Esteban")).thenReturn(Optional.of(user));
         when(scriptRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(SCRIPT_1));
@@ -243,10 +242,10 @@ public class ScriptServiceTests {
         Principal mockPrincipal = Mockito.mock(Principal.class);
         BugAssemblyParser bugAssemblyParser = mock(BugAssemblyParser.class);
         Script testScript = new Script(1L, new User(), "Highway Snobbery", ":START wiggle", "", false);
-        ModifyScriptRequest request = new ModifyScriptRequest("Highway Robbery", ":START\ngoto START");
+        ModifyScriptDTO request = new ModifyScriptDTO("Highway Robbery", ":START\ngoto START");
         User user = new User();
-        user.setId(1l);
-        USER.setId(1l);
+        user.setId(1L);
+        USER.setId(1L);
         when(mockPrincipal.getName()).thenReturn("Esteban");
         when(userRepository.findByUsername("Esteban")).thenReturn(Optional.of(user));
         when(scriptRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(SCRIPT_1));
@@ -261,8 +260,8 @@ public class ScriptServiceTests {
     @Test
     public void updateScript_throwsConflictStatusOnInappropriateName() throws BugAssemblyParseException, JsonProcessingException {
         Principal mockPrincipal = Mockito.mock(Principal.class);
-        ModifyScriptRequest request = new ModifyScriptRequest("Fucking Robbery", ":START\ngoto START");
-        USER.setId(1l);
+        ModifyScriptDTO request = new ModifyScriptDTO("Fucking Robbery", ":START\ngoto START");
+        USER.setId(1L);
         when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.of(USER));
         when(scriptRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(SCRIPT_1));
 
@@ -278,12 +277,11 @@ public class ScriptServiceTests {
         when(mockPrincipal.getName()).thenReturn("Esteban");
 
         User user = new User();
-        user.setId(2l);
-        USER.setId(1l);
+        user.setId(2L);
+        USER.setId(1L);
         when(userRepository.findByUsername("Esteban")).thenReturn(Optional.of(user));
 
         when(scriptRepository.findById(Mockito.any())).thenReturn(Optional.of(SCRIPT_1));
-        ;
 
         Assertions.assertThatThrownBy(() -> scriptService.deleteScriptById(1L, mockPrincipal))
                 .isInstanceOf(ResponseStatusException.class)
@@ -296,8 +294,8 @@ public class ScriptServiceTests {
         when(mockPrincipal.getName()).thenReturn("Esteban");
 
         User user = new User();
-        user.setId(1l);
-        USER.setId(1l);
+        user.setId(1L);
+        USER.setId(1L);
         when(userRepository.findByUsername("Esteban")).thenReturn(Optional.of(user));
 
         when(scriptRepository.findById(Mockito.any())).thenReturn(Optional.empty());
@@ -312,8 +310,8 @@ public class ScriptServiceTests {
         when(mockPrincipal.getName()).thenReturn("Esteban");
 
         User user = new User();
-        user.setId(1l);
-        USER.setId(1l);
+        user.setId(1L);
+        USER.setId(1L);
         when(userRepository.findByUsername("Esteban")).thenReturn(Optional.of(user));
 
         when(scriptRepository.findById(Mockito.any())).thenReturn(Optional.of(SCRIPT_1));
