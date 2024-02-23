@@ -1,11 +1,14 @@
 package net.crusadergames.bugwars.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.crusadergames.bugwars.config.Maps;
 import net.crusadergames.bugwars.dto.request.PlayGameDTO;
 import net.crusadergames.bugwars.dto.response.GameReplayDTO;
 import net.crusadergames.bugwars.exception.ResourceNotFoundException;
 import net.crusadergames.bugwars.game.setup.GameFactory;
+import net.crusadergames.bugwars.model.GameMap;
 import net.crusadergames.bugwars.service.GameService;
+import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -40,9 +43,13 @@ public class GameControllerTests {
 
     @Test
     public void getAllMaps_returnsAllMaps() throws Exception {
+        List<GameMap> maps = Maps.getMaps();
+        when(gameService.getAllMaps()).thenReturn(maps);
+        
         ResultActions response = mockMvc.perform(get("/api/game/maps"));
 
-        response.andExpect(MockMvcResultMatchers.status().isOk());
+        response.andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.size()", CoreMatchers.is(maps.size())));
     }
 
     @Test
