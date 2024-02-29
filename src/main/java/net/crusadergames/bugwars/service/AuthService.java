@@ -123,7 +123,7 @@ public class AuthService {
         refreshTokenService.deleteByUserId(user.getId());
     }
 
-    public User updateUserProfile(UpdateProfileRequest updateProfileRequest, Principal principal) {
+    public User updateUserProfile(Principal principal, UpdateProfileRequest updateProfileRequest) {
         if (principal == null) {
             throw new IllegalArgumentException("Principal is null");
         }

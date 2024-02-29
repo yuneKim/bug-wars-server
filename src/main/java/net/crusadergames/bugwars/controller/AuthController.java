@@ -47,7 +47,7 @@ public class AuthController {
 
     @PutMapping("/update-profile")
     public User updateProfile(@Valid @RequestBody UpdateProfileRequest updateProfileRequest, Principal principal) {
-        return authService.updateUserProfile(updateProfileRequest, principal);
+        return authService.updateUserProfile(principal, updateProfileRequest);
     }
 
     @GetMapping("/user-profile")

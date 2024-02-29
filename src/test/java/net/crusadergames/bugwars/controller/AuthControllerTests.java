@@ -92,20 +92,21 @@ public class AuthControllerTests {
         mockMvc.perform(post("/api/auth/logout"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
-//    @Test
-//    public void updateProfile_returnsUser() throws Exception {
-//        UpdateProfileRequest updateProfileRequest = new UpdateProfileRequest("test_user", "testuser", "test@gmail.com", "password111", "password111", "1");
-//        User user = new User(updateProfileRequest.getUsername(), updateProfileRequest.getEmail(), updateProfileRequest.getNewPassword());
-//        when(authService.updateUserProfile(ArgumentMatchers.any())).thenReturn(user);
-//
-//        ResultActions response = mockMvc.perform(put("/api/auth/update-profile")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(objectMapper.writeValueAsString(updateProfileRequest)));
-//
-//        response.andExpect(MockMvcResultMatchers.status().isOk())
-//                .andExpect(MockMvcResultMatchers.jsonPath("$.username", CoreMatchers.is(updateProfileRequest.getUsername())));
-//
-//    }
+    @Test
+    public void updateProfile_returnsUser() throws Exception {
+        UpdateProfileRequest updateProfileRequest = new UpdateProfileRequest("test_user", "testuser", "test@gmail.com", "password111", "password111", "1");
+        User user = new User(updateProfileRequest.getUsername(), updateProfileRequest.getEmail(), updateProfileRequest.getNewPassword());
+
+        when(authService.updateUserProfile(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(user);
+
+        ResultActions response = mockMvc.perform(put("/api/auth/update-profile")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updateProfileRequest)));
+
+        response.andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.username", CoreMatchers.is(updateProfileRequest.getUsername())));
+
+    }
 
     @Test
     public void getUserProfile_returnsUser() throws Exception {
