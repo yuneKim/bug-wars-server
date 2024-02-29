@@ -5,13 +5,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginRequest {
-    @NotBlank
-    private String username;
+public class PlayGameDTO {
 
     @NotBlank
-    private String password;
+    private List<Long> scriptIds;
+
+    @NotBlank
+    private Integer mapId;
 }
