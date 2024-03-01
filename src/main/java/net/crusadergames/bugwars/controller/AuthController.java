@@ -8,11 +8,10 @@ import net.crusadergames.bugwars.dto.response.JwtDTO;
 import net.crusadergames.bugwars.dto.response.TokenRefreshResponseDTO;
 import net.crusadergames.bugwars.exception.RefreshTokenException;
 import net.crusadergames.bugwars.exception.ResourceNotFoundException;
-import net.crusadergames.bugwars.dto.request.UpdateProfileRequest;
-import net.crusadergames.bugwars.dto.response.UserProfileResponse;
+import net.crusadergames.bugwars.dto.request.UpdateProfileRequestDTO;
+import net.crusadergames.bugwars.dto.response.UserProfileResponseDTO;
 import net.crusadergames.bugwars.model.auth.User;
 import net.crusadergames.bugwars.service.AuthService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -62,11 +61,11 @@ public class AuthController {
     }
 
     @PutMapping("/update-profile")
-    public User updateProfile(@Valid @RequestBody UpdateProfileRequest updateProfileRequest, Principal principal) {
-        return authService.updateUserProfile(principal, updateProfileRequest);
+    public User updateProfile(@Valid @RequestBody UpdateProfileRequestDTO updateProfileRequestDTO, Principal principal) {
+        return authService.updateUserProfile(principal.getName(), updateProfileRequestDTO);
     }
 
     @GetMapping("/user-profile")
-    public UserProfileResponse getUserProfile(Principal principal) {
-        return authService.getUserProfile(principal);
-    }
+    public UserProfileResponseDTO getUserProfile(Principal principal) {
+        return authService.getUserProfile(principal.getName());
+    }}

@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateProfileRequest {
+public class UpdateProfileRequestDTO {
 
 
     @Size(min = 3, max = 20)

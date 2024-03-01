@@ -8,8 +8,8 @@ import net.crusadergames.bugwars.dto.response.JwtDTO;
 import net.crusadergames.bugwars.dto.response.TokenRefreshResponseDTO;
 import net.crusadergames.bugwars.exception.RefreshTokenException;
 import net.crusadergames.bugwars.exception.ResourceNotFoundException;
-import net.crusadergames.bugwars.dto.request.UpdateProfileRequest;
-import net.crusadergames.bugwars.dto.response.UserProfileResponse;
+import net.crusadergames.bugwars.dto.request.UpdateProfileRequestDTO;
+import net.crusadergames.bugwars.dto.response.UserProfileResponseDTO;
 import net.crusadergames.bugwars.model.auth.User;
 import net.crusadergames.bugwars.service.AuthService;
 import org.hamcrest.CoreMatchers;
@@ -126,32 +126,33 @@ public class AuthControllerTests {
     }
     @Test
     public void updateProfile_returnsUser() throws Exception {
-        UpdateProfileRequest updateProfileRequest = new UpdateProfileRequest("test_user", "testuser", "test@gmail.com", "password111", "password111", "1");
-        User user = new User(updateProfileRequest.getUsername(), updateProfileRequest.getEmail(), updateProfileRequest.getNewPassword());
+        UpdateProfileRequestDTO updateProfileRequestDTO = new UpdateProfileRequestDTO("test_user", "testuser", "test@gmail.com", "password111", "password111", "1");
+        User user = new User(updateProfileRequestDTO.getUsername(), updateProfileRequestDTO.getEmail(), updateProfileRequestDTO.getNewPassword());
 
-        when(authService.updateUserProfile(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(user);
+        when(authService.updateUserProfile("test_user", updateProfileRequestDTO)).thenReturn(user);
 
-        ResultActions response = mockMvc.perform(put("/api/auth/update-profile")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updateProfileRequest)));
+        ResultActions response = mockMvc.perform(MockMvcRequestBuilders.put("/api/auth/update-profile")
+                .param("username", "test_user")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(updateProfileRequestDTO)));
 
         response.andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.username", CoreMatchers.is(updateProfileRequest.getUsername())));
-
+                .andExpect(MockMvcResultMatchers.jsonPath("$.username", CoreMatchers.is(updateProfileRequestDTO.getUsername())));
     }
+
 
     @Test
     public void getUserProfile_returnsUser() throws Exception {
-        UserProfileResponse userProfileResponse = new UserProfileResponse("test_user", "testuser","test@gmail.com", "1", 1);
-        User user = new User(userProfileResponse.getUsername(), userProfileResponse.getEmail(), userProfileResponse.getProfilePicture());
-        when(authService.getUserProfile(ArgumentMatchers.any())).thenReturn(userProfileResponse);
+        UserProfileResponseDTO userProfileResponseDTO = new UserProfileResponseDTO("test_user", "testuser","test@gmail.com", "1", 1);
+        User user = new User(userProfileResponseDTO.getUsername(), userProfileResponseDTO.getEmail(), userProfileResponseDTO.getProfilePicture());
+        when(authService.getUserProfile(ArgumentMatchers.any())).thenReturn(userProfileResponseDTO);
 
-        ResultActions response = mockMvc.perform(get("/api/auth/user-profile")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(userProfileResponse)));
+        ResultActions response = mockMvc.perform(MockMvcRequestBuilders.get("/api/auth/user-profile")
+                .param("username", "test_user")
+                .contentType(MediaType.APPLICATION_JSON));
 
         response.andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.username", CoreMatchers.is(userProfileResponse.getUsername())));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.username", CoreMatchers.is(userProfileResponseDTO.getUsername())));
 
     }
 

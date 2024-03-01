@@ -6,8 +6,8 @@ import net.crusadergames.bugwars.dto.response.JwtDTO;
 import net.crusadergames.bugwars.dto.response.TokenRefreshResponseDTO;
 import net.crusadergames.bugwars.exception.RefreshTokenException;
 import net.crusadergames.bugwars.exception.ResourceNotFoundException;
-import net.crusadergames.bugwars.dto.request.UpdateProfileRequest;
-import net.crusadergames.bugwars.dto.response.UserProfileResponse;
+import net.crusadergames.bugwars.dto.request.UpdateProfileRequestDTO;
+import net.crusadergames.bugwars.dto.response.UserProfileResponseDTO;
 import net.crusadergames.bugwars.model.auth.ERole;
 import net.crusadergames.bugwars.model.auth.RefreshToken;
 import net.crusadergames.bugwars.model.auth.Role;
@@ -72,7 +72,7 @@ public class AuthService {
                 passwordEncoder.encode(signUpDTO.getPassword()));
 
         // Set profile name to be equal to username initially
-        user.setProfileName(signUpRequest.getUsername());
+        user.setProfileName(signUpDTO.getUsername());
 
         Optional<Role> optUserRole = roleRepository.findByName(ERole.ROLE_USER);
         if (optUserRole.isEmpty()) {
@@ -117,35 +117,35 @@ public class AuthService {
         refreshTokenService.deleteByUserId(user.getId());
     }
 
-    public User updateUserProfile(Principal principal, UpdateProfileRequest updateProfileRequest) {
-        if (principal == null) {
-            throw new IllegalArgumentException("Principal is null");
+    public User updateUserProfile(String username, UpdateProfileRequestDTO updateProfileRequestDTO) {
+        if (username == null) {
+            throw new IllegalArgumentException("Username is null");
         }
 
-        User user = userRepository.findByUsername(principal.getName())
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        if (updateProfileRequest.getUsername() != null && !updateProfileRequest.getUsername().isEmpty()) {
-            if (!updateProfileRequest.getUsername().equals(user.getUsername())) {
-                user.setUsername(updateProfileRequest.getUsername());
-                user.setProfileName(updateProfileRequest.getUsername());
+        if (updateProfileRequestDTO.getUsername() != null && !updateProfileRequestDTO.getUsername().isEmpty()) {
+            if (!updateProfileRequestDTO.getUsername().equals(user.getUsername())) {
+                user.setUsername(updateProfileRequestDTO.getUsername());
+                user.setProfileName(updateProfileRequestDTO.getUsername());
             }
         }
 
-        if (updateProfileRequest.getEmail() != null && !updateProfileRequest.getEmail().isEmpty()) {
-            user.setEmail(updateProfileRequest.getEmail());
+        if (updateProfileRequestDTO.getEmail() != null && !updateProfileRequestDTO.getEmail().isEmpty()) {
+            user.setEmail(updateProfileRequestDTO.getEmail());
         }
 
-        if (updateProfileRequest.getNewPassword() != null && !updateProfileRequest.getNewPassword().isEmpty()) {
-            user.setPassword(passwordEncoder.encode(updateProfileRequest.getNewPassword()));
+        if (updateProfileRequestDTO.getNewPassword() != null && !updateProfileRequestDTO.getNewPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(updateProfileRequestDTO.getNewPassword()));
         }
 
-        if (updateProfileRequest.getProfilePicture() != null && !updateProfileRequest.getProfilePicture().isEmpty()) {
-            user.setProfilePicture(updateProfileRequest.getProfilePicture());
+        if (updateProfileRequestDTO.getProfilePicture() != null && !updateProfileRequestDTO.getProfilePicture().isEmpty()) {
+            user.setProfilePicture(updateProfileRequestDTO.getProfilePicture());
         }
 
-        if (updateProfileRequest.getProfileName() != null && !updateProfileRequest.getProfileName().isEmpty()) {
-            user.setProfileName(updateProfileRequest.getProfileName());
+        if (updateProfileRequestDTO.getProfileName() != null && !updateProfileRequestDTO.getProfileName().isEmpty()) {
+            user.setProfileName(updateProfileRequestDTO.getProfileName());
         }
 
         try {
@@ -159,13 +159,13 @@ public class AuthService {
         }
     }
 
-    public UserProfileResponse getUserProfile(Principal principal) {
-        if (principal == null) {
-            throw new IllegalArgumentException("Principal is null");
+    public UserProfileResponseDTO getUserProfile(String username) {
+        if (username == null) {
+            throw new IllegalArgumentException("Username from Principal is null");
         }
 
-        User user = userRepository.findByUsername(principal.getName())
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        return new UserProfileResponse(user.getUsername(), user.getProfileName(), user.getEmail(), user.getProfilePicture(), user.getAmountOfScripts());
+        return new UserProfileResponseDTO(user.getUsername(), user.getProfileName(), user.getEmail(), user.getProfilePicture(), user.getAmountOfScripts());
     }
 }
