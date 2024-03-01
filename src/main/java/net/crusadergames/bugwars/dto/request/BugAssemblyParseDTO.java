@@ -8,11 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ModifyScriptRequest {
-
+public class BugAssemblyParseDTO {
     @NotBlank
-    private String name;
-
-    @NotBlank
-    private String raw;
+    private String code;
 }

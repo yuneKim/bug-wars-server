@@ -6,9 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class BugAssemblyParseRequest {
+@NoArgsConstructor
+public class TokenRefreshRequestDTO {
     @NotBlank
-    private String code;
+    private String refreshToken;
 }

@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @Data
-public class GameReplay {
+public class GameReplayDTO {
     private static Map<String, Integer> ENTITY_MAP = Map.of(
             "Null", 0,
             "Wall", 1,
@@ -32,7 +32,7 @@ public class GameReplay {
     private final List<List<ActionSummary>> replay;
     private final List<Swarm> swarms;
 
-    public GameReplay(String map, Entity[][] grid, List<Swarm> swarms) {
+    public GameReplayDTO(String map, Entity[][] grid, List<Swarm> swarms) {
         this.map = map;
         this.battleground = squashBattleground(grid);
         this.swarms = swarms;
