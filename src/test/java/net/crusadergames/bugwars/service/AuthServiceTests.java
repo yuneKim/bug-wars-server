@@ -198,14 +198,12 @@ public class AuthServiceTests {
     }
 
     @Test
-    void verifyEmailToken_throwsExceptionWhenUserDoesNotExist() {
+    void verifyEmailToken_returnsFalseWhenUserDoesNotExist() {
         String token = "49370bea-5a8c-4fba-8887-980e1b320b14";
         String username = "BugWarsUser";
         Mockito.when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
-
-        Assertions.assertThatThrownBy(() -> authService.verifyEmailToken(token, username))
-                .isInstanceOf(ResponseStatusException.class)
-                .hasFieldOrPropertyWithValue("status", HttpStatus.INTERNAL_SERVER_ERROR);
+        boolean result = authService.verifyEmailToken(token, username);
+        Assertions.assertThat(result).isFalse();
     }
 
 }
