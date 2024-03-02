@@ -124,36 +124,43 @@ public class AuthControllerTests {
         mockMvc.perform(post("/api/auth/logout"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
+
     @Test
     public void updateProfile_returnsUser() throws Exception {
         UpdateProfileRequestDTO updateProfileRequestDTO = new UpdateProfileRequestDTO("test_user", "testuser", "test@gmail.com", "password111", "password111", "1");
         User user = new User(updateProfileRequestDTO.getUsername(), updateProfileRequestDTO.getEmail(), updateProfileRequestDTO.getNewPassword());
 
-        when(authService.updateUserProfile("test_user", updateProfileRequestDTO)).thenReturn(user);
+        Principal mockPrincipal = Mockito.mock(Principal.class);
+        Mockito.when(mockPrincipal.getName()).thenReturn("test_user");
+
+        when(authService.updateUserProfile(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(user);
 
         ResultActions response = mockMvc.perform(MockMvcRequestBuilders.put("/api/auth/update-profile")
-                .param("username", "test_user")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .contentType(MediaType.APPLICATION_JSON)
+                .principal(mockPrincipal)
                 .content(objectMapper.writeValueAsString(updateProfileRequestDTO)));
 
         response.andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.username", CoreMatchers.is(updateProfileRequestDTO.getUsername())));
-    }
 
+    }
 
     @Test
     public void getUserProfile_returnsUser() throws Exception {
         UserProfileResponseDTO userProfileResponseDTO = new UserProfileResponseDTO("test_user", "testuser","test@gmail.com", "1", 1);
         User user = new User(userProfileResponseDTO.getUsername(), userProfileResponseDTO.getEmail(), userProfileResponseDTO.getProfilePicture());
+
+        Principal mockPrincipal = Mockito.mock(Principal.class);
+        Mockito.when(mockPrincipal.getName()).thenReturn("test_user");
+
         when(authService.getUserProfile(ArgumentMatchers.any())).thenReturn(userProfileResponseDTO);
 
         ResultActions response = mockMvc.perform(MockMvcRequestBuilders.get("/api/auth/user-profile")
-                .param("username", "test_user")
-                .contentType(MediaType.APPLICATION_JSON));
+                .contentType(MediaType.APPLICATION_JSON)
+                .principal(mockPrincipal));  // Set the mockPrincipal here
 
         response.andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.username", CoreMatchers.is(userProfileResponseDTO.getUsername())));
-
     }
 
     @Test
