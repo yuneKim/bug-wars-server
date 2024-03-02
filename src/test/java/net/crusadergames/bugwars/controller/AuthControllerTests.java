@@ -8,6 +8,8 @@ import net.crusadergames.bugwars.dto.response.JwtDTO;
 import net.crusadergames.bugwars.dto.response.TokenRefreshResponseDTO;
 import net.crusadergames.bugwars.exception.RefreshTokenException;
 import net.crusadergames.bugwars.exception.ResourceNotFoundException;
+import net.crusadergames.bugwars.dto.request.UpdateProfileRequestDTO;
+import net.crusadergames.bugwars.dto.response.UserProfileResponseDTO;
 import net.crusadergames.bugwars.model.auth.User;
 import net.crusadergames.bugwars.service.AuthService;
 import org.hamcrest.CoreMatchers;
@@ -121,6 +123,44 @@ public class AuthControllerTests {
     public void logout_handlesNullPrincipal() throws Exception {
         mockMvc.perform(post("/api/auth/logout"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    public void updateProfile_returnsUser() throws Exception {
+        UpdateProfileRequestDTO updateProfileRequestDTO = new UpdateProfileRequestDTO("test_user", "testuser", "test@gmail.com", "password111", "password111", "1");
+        User user = new User(updateProfileRequestDTO.getUsername(), updateProfileRequestDTO.getEmail(), updateProfileRequestDTO.getNewPassword());
+
+        Principal mockPrincipal = Mockito.mock(Principal.class);
+        Mockito.when(mockPrincipal.getName()).thenReturn("test_user");
+
+        when(authService.updateUserProfile(ArgumentMatchers.any(), ArgumentMatchers.any())).thenReturn(user);
+
+        ResultActions response = mockMvc.perform(MockMvcRequestBuilders.put("/api/auth/update-profile")
+                .contentType(MediaType.APPLICATION_JSON)
+                .principal(mockPrincipal)
+                .content(objectMapper.writeValueAsString(updateProfileRequestDTO)));
+
+        response.andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.username", CoreMatchers.is(updateProfileRequestDTO.getUsername())));
+
+    }
+
+    @Test
+    public void getUserProfile_returnsUser() throws Exception {
+        UserProfileResponseDTO userProfileResponseDTO = new UserProfileResponseDTO("test_user", "testuser","test@gmail.com", "1", 1);
+        User user = new User(userProfileResponseDTO.getUsername(), userProfileResponseDTO.getEmail(), userProfileResponseDTO.getProfilePicture());
+
+        Principal mockPrincipal = Mockito.mock(Principal.class);
+        Mockito.when(mockPrincipal.getName()).thenReturn("test_user");
+
+        when(authService.getUserProfile(ArgumentMatchers.any())).thenReturn(userProfileResponseDTO);
+
+        ResultActions response = mockMvc.perform(MockMvcRequestBuilders.get("/api/auth/user-profile")
+                .contentType(MediaType.APPLICATION_JSON)
+                .principal(mockPrincipal));  // Set the mockPrincipal here
+
+        response.andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.username", CoreMatchers.is(userProfileResponseDTO.getUsername())));
     }
 
     @Test

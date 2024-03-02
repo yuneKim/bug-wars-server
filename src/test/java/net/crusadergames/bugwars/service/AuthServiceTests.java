@@ -161,5 +161,4 @@ public class AuthServiceTests {
         Assertions.assertThatThrownBy(() -> authService.logout("Fred"))
                 .isInstanceOf(ResourceNotFoundException.class);
     }
-
 }

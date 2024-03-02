@@ -8,6 +8,8 @@ import net.crusadergames.bugwars.dto.response.JwtDTO;
 import net.crusadergames.bugwars.dto.response.TokenRefreshResponseDTO;
 import net.crusadergames.bugwars.exception.RefreshTokenException;
 import net.crusadergames.bugwars.exception.ResourceNotFoundException;
+import net.crusadergames.bugwars.dto.request.UpdateProfileRequestDTO;
+import net.crusadergames.bugwars.dto.response.UserProfileResponseDTO;
 import net.crusadergames.bugwars.model.auth.User;
 import net.crusadergames.bugwars.service.AuthService;
 import org.springframework.http.HttpStatus;
@@ -57,4 +59,13 @@ public class AuthController {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
-}
+
+    @PutMapping("/update-profile")
+    public User updateProfile(@Valid @RequestBody UpdateProfileRequestDTO updateProfileRequestDTO, Principal principal) {
+        return authService.updateUserProfile(principal.getName(), updateProfileRequestDTO);
+    }
+
+    @GetMapping("/user-profile")
+    public UserProfileResponseDTO getUserProfile(Principal principal) {
+        return authService.getUserProfile(principal.getName());
+    }}

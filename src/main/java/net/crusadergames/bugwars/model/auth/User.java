@@ -44,6 +44,17 @@ public class User {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
+    @Size(max = 255)
+    private String profilePicture;
+
+    @Size(min = 3, max = 50)
+    private String profileName;
+
+    @JsonIgnore
+    public int getAmountOfScripts() {
+        return scripts != null ? scripts.size() : 0;
+    }
+
     @ToString.Exclude
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
