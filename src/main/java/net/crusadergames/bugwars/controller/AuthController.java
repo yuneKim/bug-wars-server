@@ -68,4 +68,10 @@ public class AuthController {
     @GetMapping("/user-profile")
     public UserProfileResponseDTO getUserProfile(Principal principal) {
         return authService.getUserProfile(principal.getName());
-    }}
+    }
+
+    @PostMapping("/verify/{username}/{token}")
+    public boolean verifyEmail(@PathVariable String username, @PathVariable String token) {
+        return authService.verifyEmailToken(token, username);
+    }
+}

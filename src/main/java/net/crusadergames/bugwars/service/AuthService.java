@@ -1,6 +1,7 @@
 package net.crusadergames.bugwars.service;
 
 import com.modernmt.text.profanity.ProfanityFilter;
+import lombok.RequiredArgsConstructor;
 import net.crusadergames.bugwars.dto.request.SignupDTO;
 import net.crusadergames.bugwars.dto.response.JwtDTO;
 import net.crusadergames.bugwars.dto.response.TokenRefreshResponseDTO;
@@ -28,12 +29,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.dao.DataIntegrityViolationException;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
     private final RefreshTokenService refreshTokenService;
     private final UserRepository userRepository;
@@ -41,17 +46,8 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
+    private final EmailService emailService;
 
-    public AuthService(RefreshTokenService refreshTokenService, UserRepository userRepository,
-                       RoleRepository roleRepository, AuthenticationManager authenticationManager,
-                       JwtUtils jwtUtils, PasswordEncoder passwordEncoder) {
-        this.refreshTokenService = refreshTokenService;
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-        this.authenticationManager = authenticationManager;
-        this.jwtUtils = jwtUtils;
-        this.passwordEncoder = passwordEncoder;
-    }
 
     public User registerUser(SignupDTO signUpDTO) {
 
@@ -80,6 +76,15 @@ public class AuthService {
         }
         Role userRole = optUserRole.get();
         user.setRoles(Set.of(userRole));
+
+        user.setEmailVerified(false);
+
+        user.setEmailVerificationExpiry(LocalDateTime.now().plusDays(7L));
+
+        String verificationToken = UUID.randomUUID().toString();
+        user.setEmailVerificationToken(verificationToken);
+
+        emailService.sendVerificationLink(user);
         return userRepository.save(user);
     }
 
@@ -167,5 +172,19 @@ public class AuthService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         return new UserProfileResponseDTO(user.getUsername(), user.getProfileName(), user.getEmail(), user.getProfilePicture(), user.getAmountOfScripts());
+    }
+
+    public boolean verifyEmailToken(String token, String username) {
+        Optional<User> optionalUser = userRepository.findByUsername(username);
+        if (optionalUser.isEmpty()) {
+            return false;
+        }
+        User user = optionalUser.get();
+        boolean isVerified = token.equals(user.getEmailVerificationToken());
+        if (isVerified){
+            user.setEmailVerified(true);
+            userRepository.save(user);
+        }
+        return isVerified;
     }
 }

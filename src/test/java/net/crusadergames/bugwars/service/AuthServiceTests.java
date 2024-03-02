@@ -36,6 +36,7 @@ public class AuthServiceTests {
     private RoleRepository roleRepository;
     private AuthenticationManager authenticationManager;
     private AuthService authService;
+    private EmailService emailService;
 
     @BeforeEach
     public void setup() {
@@ -43,10 +44,11 @@ public class AuthServiceTests {
         userRepository = Mockito.mock(UserRepository.class);
         roleRepository = Mockito.mock(RoleRepository.class);
         authenticationManager = Mockito.mock(AuthenticationManager.class);
+        emailService = Mockito.mock(EmailService.class);
         JwtUtils jwtUtils = Mockito.mock(JwtUtils.class);
         PasswordEncoder passwordEncoder = Mockito.mock(PasswordEncoder.class);
-        authService = new AuthService(refreshTokenService, userRepository, roleRepository, authenticationManager,
-                jwtUtils, passwordEncoder);
+        authService = new AuthService(refreshTokenService, userRepository, roleRepository, passwordEncoder,
+                authenticationManager, jwtUtils, emailService);
     }
 
     @Test
