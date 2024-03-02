@@ -131,11 +131,16 @@ public class AuthService {
     }
 
     public boolean verifyEmailToken(String token, String username) {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
-        if (token.equals(user.getEmailVerificationToken()) ){
+        Optional<User> optionalUser = userRepository.findByUsername(username);
+        if (optionalUser.isEmpty()) {
+            return false;
+        }
+        User user = optionalUser.get();
+        boolean isVerified = token.equals(user.getEmailVerificationToken());
+        if (isVerified){
             user.setEmailVerified(true);
             userRepository.save(user);
         }
-        return user.isEmailVerified();
+        return isVerified;
     }
 }
