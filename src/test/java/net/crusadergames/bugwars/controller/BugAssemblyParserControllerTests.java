@@ -1,7 +1,8 @@
 package net.crusadergames.bugwars.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.crusadergames.bugwars.dto.request.BugAssemblyParseRequest;
+import net.crusadergames.bugwars.dto.request.BugAssemblyParseDTO;
+import net.crusadergames.bugwars.parser.BugAssemblyParseException;
 import net.crusadergames.bugwars.service.BugAssemblyParserService;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
@@ -38,17 +39,29 @@ public class BugAssemblyParserControllerTests {
 
     @Test
     public void parse_returnsBytecode() throws Exception {
-        BugAssemblyParseRequest bugAssemblyParseRequest = new BugAssemblyParseRequest(":START\ngoto START");
+        BugAssemblyParseDTO bugAssemblyParseDTO = new BugAssemblyParseDTO(":START\ngoto START");
         when(bugAssemblyParserService.parse(ArgumentMatchers.any())).thenReturn(List.of(35, 0));
 
         ResultActions response = mockMvc.perform(post("/api/parse")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(bugAssemblyParseRequest)));
+                .content(objectMapper.writeValueAsString(bugAssemblyParseDTO)));
 
         response.andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.length()", CoreMatchers.is(2)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0]", CoreMatchers.is(35)))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[1]", CoreMatchers.is(0)));
 
+    }
+
+    @Test
+    public void parse_respondsWithUnprocessableEntityIfInvalidBytecode() throws Exception {
+        BugAssemblyParseDTO bugAssemblyParseDTO = new BugAssemblyParseDTO(":START\ngoto");
+        when(bugAssemblyParserService.parse(ArgumentMatchers.any())).thenThrow(BugAssemblyParseException.class);
+
+        ResultActions response = mockMvc.perform(post("/api/parse")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(bugAssemblyParseDTO)));
+
+        response.andExpect(MockMvcResultMatchers.status().isUnprocessableEntity());
     }
 }

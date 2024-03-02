@@ -1,6 +1,6 @@
 package net.crusadergames.bugwars.advice;
 
-import net.crusadergames.bugwars.exception.TokenRefreshException;
+import net.crusadergames.bugwars.exception.RefreshTokenException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -11,9 +11,9 @@ import java.util.Date;
 
 @RestControllerAdvice
 public class AuthControllerAdvice {
-    @ExceptionHandler(value = TokenRefreshException.class)
+    @ExceptionHandler(value = RefreshTokenException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ErrorMessage handleTokenRefreshException(TokenRefreshException ex, WebRequest request) {
+    public ErrorMessage handleTokenRefreshException(RefreshTokenException ex, WebRequest request) {
         return new ErrorMessage(
                 HttpStatus.FORBIDDEN.value(),
                 new Date(),

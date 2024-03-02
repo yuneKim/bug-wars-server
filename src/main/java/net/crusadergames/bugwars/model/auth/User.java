@@ -1,7 +1,6 @@
 package net.crusadergames.bugwars.model.auth;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -46,6 +45,17 @@ public class User {
     @Size(max = 120)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
+
+    @Size(max = 255)
+    private String profilePicture;
+
+    @Size(min = 3, max = 50)
+    private String profileName;
+
+    @JsonIgnore
+    public int getAmountOfScripts() {
+        return scripts != null ? scripts.size() : 0;
+    }
 
     @ToString.Exclude
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

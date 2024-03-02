@@ -1,10 +1,10 @@
 package net.crusadergames.bugwars.service;
 
-import net.crusadergames.bugwars.dto.request.LoginRequest;
-import net.crusadergames.bugwars.dto.request.SignupRequest;
-import net.crusadergames.bugwars.dto.request.TokenRefreshRequest;
-import net.crusadergames.bugwars.dto.response.JwtResponse;
-import net.crusadergames.bugwars.exception.TokenRefreshException;
+import net.crusadergames.bugwars.dto.request.LoginDTO;
+import net.crusadergames.bugwars.dto.request.SignupDTO;
+import net.crusadergames.bugwars.dto.response.JwtDTO;
+import net.crusadergames.bugwars.exception.RefreshTokenException;
+import net.crusadergames.bugwars.exception.ResourceNotFoundException;
 import net.crusadergames.bugwars.model.auth.ERole;
 import net.crusadergames.bugwars.model.auth.RefreshToken;
 import net.crusadergames.bugwars.model.auth.Role;
@@ -15,12 +15,9 @@ import net.crusadergames.bugwars.security.jwt.JwtUtils;
 import net.crusadergames.bugwars.security.service.RefreshTokenService;
 import net.crusadergames.bugwars.security.service.UserDetailsImpl;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -28,105 +25,97 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.security.Principal;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
 public class AuthServiceTests {
-    @Mock
-    private UserRepository userRepository;
-
-    @Mock
-    private RoleRepository roleRepository;
-
-    @Mock
-    private PasswordEncoder passwordEncoder;
-
-    @Mock
-    private JwtUtils jwtUtils;
-
-    @Mock
-    private AuthenticationManager authenticationManager;
-
-    @Mock
     private RefreshTokenService refreshTokenService;
-
-    @InjectMocks
+    private UserRepository userRepository;
+    private RoleRepository roleRepository;
+    private AuthenticationManager authenticationManager;
     private AuthService authService;
-
-    @Mock
     private EmailService emailService;
+
+    @BeforeEach
+    public void setup() {
+        refreshTokenService = Mockito.mock(RefreshTokenService.class);
+        userRepository = Mockito.mock(UserRepository.class);
+        roleRepository = Mockito.mock(RoleRepository.class);
+        authenticationManager = Mockito.mock(AuthenticationManager.class);
+        emailService = Mockito.mock(EmailService.class);
+        JwtUtils jwtUtils = Mockito.mock(JwtUtils.class);
+        PasswordEncoder passwordEncoder = Mockito.mock(PasswordEncoder.class);
+        authService = new AuthService(refreshTokenService, userRepository, roleRepository, passwordEncoder,
+                authenticationManager, jwtUtils, emailService);
+    }
 
     @Test
     public void registerUser_returnsUser() {
-        SignupRequest signupRequest = new SignupRequest("test_user", "test@gmail.com", "password111");
-        User user = new User(signupRequest.getUsername(), signupRequest.getEmail(), signupRequest.getPassword());
+        SignupDTO signupDTO = new SignupDTO("test_user", "test@gmail.com", "password111");
+        User user = new User(signupDTO.getUsername(), signupDTO.getEmail(), signupDTO.getPassword());
         when(userRepository.existsByUsernameIgnoreCase(Mockito.any())).thenReturn(false);
         when(userRepository.existsByEmailIgnoreCase(Mockito.any())).thenReturn(false);
         when(userRepository.save(Mockito.any(User.class))).thenReturn(user);
         when(roleRepository.findByName(Mockito.any(ERole.class))).thenReturn(Optional.of(new Role(1, ERole.ROLE_USER)));
 
-        User savedUser = authService.registerUser(signupRequest);
+        User savedUser = authService.registerUser(signupDTO);
 
         Assertions.assertThat(savedUser).isNotNull();
     }
 
     @Test
     public void registerUser_respondsWithConflictStatusOnDuplicateUsername() {
-        SignupRequest signupRequest = new SignupRequest("test_user", "test@gmail.com", "password111");
+        SignupDTO signupDTO = new SignupDTO("test_user", "test@gmail.com", "password111");
         when(userRepository.existsByUsernameIgnoreCase(Mockito.any())).thenReturn(true);
 
-        Assertions.assertThatThrownBy(() -> authService.registerUser(signupRequest))
+        Assertions.assertThatThrownBy(() -> authService.registerUser(signupDTO))
                 .isInstanceOf(ResponseStatusException.class)
                 .hasFieldOrPropertyWithValue("status", HttpStatus.CONFLICT);
     }
 
     @Test
     public void registerUser_respondsWithConflictStatusOnDuplicateEmail() {
-        SignupRequest signupRequest = new SignupRequest("test_user", "test@gmail.com", "password111");
+        SignupDTO signupDTO = new SignupDTO("test_user", "test@gmail.com", "password111");
         when(userRepository.existsByEmailIgnoreCase(Mockito.any())).thenReturn(true);
 
-        Assertions.assertThatThrownBy(() -> authService.registerUser(signupRequest))
+        Assertions.assertThatThrownBy(() -> authService.registerUser(signupDTO))
                 .isInstanceOf(ResponseStatusException.class)
                 .hasFieldOrPropertyWithValue("status", HttpStatus.CONFLICT);
     }
 
     @Test
     public void registerUser_respondsWithErrorMessageOnInappropriateUsername() {
-        SignupRequest signupRequest = new SignupRequest("fuck asdfa", "test@gmail.com", "password111");
+        SignupDTO signupDTO = new SignupDTO("fuck asdfa", "test@gmail.com", "password111");
         when(userRepository.existsByEmailIgnoreCase(Mockito.any())).thenReturn(false);
 
-        Assertions.assertThatThrownBy(() -> authService.registerUser(signupRequest))
+        Assertions.assertThatThrownBy(() -> authService.registerUser(signupDTO))
                 .isInstanceOf(ResponseStatusException.class)
                 .hasFieldOrPropertyWithValue("status", HttpStatus.BAD_REQUEST);
     }
 
     @Test
     public void registerUser_respondsWithServerErrorOnMissingRole() {
-        SignupRequest signupRequest = new SignupRequest("test_user", "test@gmail.com", "password111");
+        SignupDTO signupDTO = new SignupDTO("test_user", "test@gmail.com", "password111");
         when(roleRepository.findByName(Mockito.any())).thenReturn(Optional.empty());
 
-        Assertions.assertThatThrownBy(() -> authService.registerUser(signupRequest))
+        Assertions.assertThatThrownBy(() -> authService.registerUser(signupDTO))
                 .isInstanceOf(ResponseStatusException.class)
                 .hasFieldOrPropertyWithValue("status", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Test
     public void authenticateUser_returnsJwtResponse() {
-        LoginRequest loginRequest = new LoginRequest("test_user", "password111");
-        JwtResponse jwtResponse = new JwtResponse("accessToken", "refreshToken", "user", List.of("ROLE_USER"));
+        LoginDTO loginDTO = new LoginDTO("test_user", "password111");
 
         Authentication mockAuthentication = mock(Authentication.class);
         when(authenticationManager.authenticate(Mockito.any())).thenReturn(mockAuthentication);
 
         UserDetailsImpl mockUserDetails = new UserDetailsImpl(
                 1L,
-                loginRequest.getUsername(),
-                loginRequest.getPassword(),
+                loginDTO.getUsername(),
+                loginDTO.getPassword(),
                 Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"))
         );
         RefreshToken mockRefreshToken = new RefreshToken();
@@ -135,75 +124,43 @@ public class AuthServiceTests {
         when(mockAuthentication.getPrincipal()).thenReturn(mockUserDetails);
         when(refreshTokenService.createRefreshToken(Mockito.any())).thenReturn(mockRefreshToken);
 
-        JwtResponse response = authService.authenticateUser(loginRequest);
+        JwtDTO response = authService.authenticateUser(loginDTO.getUsername(), loginDTO.getPassword());
 
         Assertions.assertThat(response).isNotNull();
     }
 
     @Test
-    public void refreshToken_returnsTokenRefreshResponse() {
-        TokenRefreshRequest request = new TokenRefreshRequest("token");
+    public void refreshToken_returnsTokenRefreshResponse() throws RefreshTokenException {
         RefreshToken refreshToken = Mockito.mock(RefreshToken.class);
         User mockUser = new User();
         mockUser.setUsername("test_user");
         when(refreshTokenService.findByToken(Mockito.any())).thenReturn(Optional.of(refreshToken));
         when(refreshToken.getUser()).thenReturn(mockUser);
-        Assertions.assertThat(authService.refreshToken(request)).isNotNull();
+        Assertions.assertThat(authService.refreshToken("token")).isNotNull();
     }
 
     @Test
     public void refreshToken_throwsExceptionWhenTokenIsNotFound() {
-        TokenRefreshRequest request = new TokenRefreshRequest("token");
         when(refreshTokenService.findByToken(Mockito.any())).thenReturn(Optional.empty());
 
-        Assertions.assertThatThrownBy(() -> authService.refreshToken(request))
-                .isInstanceOf(TokenRefreshException.class);
+        Assertions.assertThatThrownBy(() -> authService.refreshToken("token"))
+                .isInstanceOf(RefreshTokenException.class);
     }
 
     @Test
-    public void logout_deletesRefreshToken() {
+    public void logout_deletesRefreshToken() throws ResourceNotFoundException {
         User mockUser = new User();
         mockUser.setId(5L);
         when(userRepository.findByUsername(Mockito.any())).thenReturn(Optional.of(mockUser));
-        authService.logout(Mockito.mock(Principal.class));
+        authService.logout("Fred");
         verify(refreshTokenService).deleteByUserId(mockUser.getId());
     }
 
     @Test
-    public void logout_handlesNullPrincipal() {
-        Assertions.assertThatCode(() -> authService.logout(null)).doesNotThrowAnyException();
-    }
-
-    @Test
     public void logout_throwsExceptionWhenUserDoesNotExist() {
-        Principal mockPrincipal = Mockito.mock(Principal.class);
-        when(mockPrincipal.getName()).thenReturn("Fred");
         when(userRepository.findByUsername("Fred")).thenReturn(Optional.empty());
 
-        Assertions.assertThatThrownBy(() -> authService.logout(mockPrincipal))
-                .isInstanceOf(ResponseStatusException.class)
-                .hasFieldOrPropertyWithValue("status", HttpStatus.INTERNAL_SERVER_ERROR);
+        Assertions.assertThatThrownBy(() -> authService.logout("Fred"))
+                .isInstanceOf(ResourceNotFoundException.class);
     }
-
-    @Test
-    void verifyEmailToken_shouldReturnTrue() {
-        String token = "49370bea-5a8c-4fba-8887-980e1b320b14";
-        String username = "BugWarsUser";
-        User user = new User();
-        user.setUsername(username);
-        user.setEmailVerificationToken(token);
-        Mockito.when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
-        boolean result = authService.verifyEmailToken(token, username);
-        Assertions.assertThat(result).isEqualTo(true);
-    }
-
-    @Test
-    void verifyEmailToken_returnsFalseWhenUserDoesNotExist() {
-        String token = "49370bea-5a8c-4fba-8887-980e1b320b14";
-        String username = "BugWarsUser";
-        Mockito.when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
-        boolean result = authService.verifyEmailToken(token, username);
-        Assertions.assertThat(result).isFalse();
-    }
-
 }

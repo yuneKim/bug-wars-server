@@ -2,7 +2,7 @@ name: Java CI with Maven
 
 on:
   pull_request:
-    branches: [ "main" ]
+    branches: [ main, dev ]
 
 env:
   COVERAGE_THRESHOLD: 80
